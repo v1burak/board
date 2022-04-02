@@ -1,0 +1,64 @@
+.row-component {
+  position: relative;
+}
+
+.row-control {
+  position: absolute;
+  height: 132px;
+  right: 0;
+  transition: all 0.2s ease-in-out;
+  z-index: 1;
+}
+
+.row-content {
+  height: 100%;
+  position: relative;
+  z-index: 100;
+  margin: 5px 0px 5px 0px;
+  border-radius: 2px;
+  background-color: rgb(90, 155, 252, 0.5);
+}
+
+.row-control div {
+  padding: 6px;
+}
+
+.row-component:hover > .row-control, .row-control:hover {
+  transform: translateX(26px);
+}
+
+.row-label {
+  padding: 5px;
+  margin: 0px;
+  opacity: 0.7;
+}
+
+.row:empty {
+  height: 132px;
+}
+
+.glyphicon-plus, .glyphicon-remove {
+  padding-left: 1px;
+}
+
+.add-row {
+  position: relative;
+  z-index: 100;
+  background-color: #fff;
+  border: 1px dashed black;
+  height: 35px;
+  padding-left: 0px;
+  margin: 5px 0px 5px 0px;
+}
+
+.add-row:hover {
+  cursor: pointer;
+}
+
+.add-row .glyphicon-plus, .new-col .glyphicon-plus {
+  padding-top: 8px;
+}
+
+.row-control > *:hover {
+  cursor: pointer;
+}

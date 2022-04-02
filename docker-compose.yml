@@ -1,0 +1,20 @@
+version: "1.0"
+services:
+  web:
+    build: ./front
+    depends_on:
+      - api
+    ports:
+      - "3000:3000"
+    networks:
+      - network-backend
+  api:
+    build: ./node_api
+    ports:
+      - "3001:3001"
+      - "3002:3002"
+    networks: 
+     - network-backend
+
+networks:
+  network-backend:

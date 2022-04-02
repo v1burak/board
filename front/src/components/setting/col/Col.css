@@ -1,0 +1,65 @@
+.row 
+  > .col {
+    max-height: calc(100% - 10px);
+    margin: 5px 0;
+    padding: 0 5px;
+    transition: all 0.5s;
+  }
+
+.new-col {
+  border: 1px dashed black;
+  height: 150px;
+  width: 7.2%;
+  justify-content: center;
+  margin: 5px 5px;
+  font-size: 50px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  left: 100%;
+}
+
+.new-col:hover {
+  cursor: pointer;
+}
+
+.col div:hover {
+  cursor: move;
+}
+
+.col .glyphicon-remove {
+  position: absolute;
+  opacity: 0.2;
+  right: 10px;
+  top: 10px;
+}
+
+.col .glyphicon-remove:hover {
+  cursor: pointer;
+  opacity: 1;
+}
+
+.col-drag-item {
+  background-color: #ebe8e8 !important;
+}
+
+.col-inner {
+  position: relative;
+  z-index: 1000;
+  height: 100%;
+  background-color: rgb(90, 155, 252);
+  border-radius: 2px;
+  padding: 5px;
+  position: relative;
+}
+
+.col-sizes {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  max-width: 80%;
+  height: 100%;
+}
