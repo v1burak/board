@@ -45,12 +45,21 @@ class Setting extends Component {
     timerModalState: false,
     timerStart: 9,
     timerEnd: 23,
-    token: sessionStorage.getItem('auth')
+    token: sessionStorage.getItem('auth'),
+    images: []
   }
 
   componentDidMount() {
     this.getConfig();
+    this.fetchAllImages();
   }
+
+  fetchAllImages() {
+		fetch(API_URL + 'images').then(response => response.json())
+		.then(data => {
+			this.setState({images : data.data});
+		});
+	}
 
   getConfig = () => {
 		fetch(API_URL + 'config').then(response => response.json())
@@ -88,9 +97,13 @@ class Setting extends Component {
           rows[counter].cols = [
             {width: (row.width / 100) * 12, type: row.type, value: row.startPosition}
           ];
-        } else {
+        } else if (row.type === 'frame') {
           rows[counter].cols = [
             {width: (row.width / 100) * 12, type: row.type, value: row.url}
+          ];
+        } else if (row.type === 'slider') {
+          rows[counter].cols = [
+            {width: (row.width / 100) * 12, type: row.type, value: row.startPosition, images: row.images, delay: row.delay}
           ];
         }
         
@@ -101,8 +114,10 @@ class Setting extends Component {
 
         if (row.type === 'video') {
           rows[counter].cols.push({width: (row.width / 100) * 12, type: row.type, value: row.startPosition});
-        } else {
+        } else if (row.type === 'frame') {
           rows[counter].cols.push({width: (row.width / 100) * 12, type: row.type, value: row.url});
+        } else if (row.type === 'slider') {
+          rows[counter].cols.push({width: (row.width / 100) * 12, type: row.type, value: row.startPosition, images: row.images, delay: row.delay});
         }
       }
     })
@@ -283,12 +298,58 @@ class Setting extends Component {
     })
   }
 
+  updateInputDelayState = (row_number, index, value) => {
+    const rows = this.state.rows.map((row, id) => {
+      if (row.row_number === row_number) {
+        const newCol = row.cols.map((col, i) => {
+          if (index === i) {
+            col.delay = value;
+            return col
+          } else {
+            return col
+          }
+        })
+        row.cols = newCol
+        return row;
+      } else {
+        return row;
+      }
+    })
+
+    this.setState({
+      rows
+    })
+  }
+
   updateSelectState = (row_number, index, value) => {
     const rows = this.state.rows.map((row, id) => {
       if (row.row_number === row_number) {
         const newCol = row.cols.map((col, i) => {
           if (index === i) {
             col.type = value;
+            return col
+          } else {
+            return col
+          }
+        })
+        row.cols = newCol
+        return row;
+      } else {
+        return row;
+      }
+    })
+
+    this.setState({
+      rows
+    })
+  }
+
+  updateSelectImageState = (row_number, index, value) => {
+    const rows = this.state.rows.map((row, id) => {
+      if (row.row_number === row_number) {
+        const newCol = row.cols.map((col, i) => {
+          if (index === i) {
+            col.images = value;
             return col
           } else {
             return col
@@ -454,9 +515,12 @@ class Setting extends Component {
 
         if (col.type === 'video') {
           colParams.startPosition = Number(col.value);
-          console.log(col);
-        } else {
+        } else if (col.type === 'frame') {
           colParams.url = col.value;
+        } else if (col.type === 'slider') {
+          colParams.images = col.images;
+          colParams.delay = col.delay;
+          colParams.startPosition = Number(col.value);
         }
 
         rows.push(colParams);
@@ -489,8 +553,6 @@ class Setting extends Component {
 
   handleHeight = (event, id) => {
     event.preventDefault();
-
-    console.log(id);
 
     if (this.state.tempHeight) {
       const rows = this.state.rows;
@@ -614,9 +676,12 @@ class Setting extends Component {
                         changeColumnWidth={this.changeColumnWidth}
                         updateSelectState={this.updateSelectState}
                         updateInputState={this.updateInputState}
+                        updateSelectImageState={this.updateSelectImageState}
+                        updateInputDelayState={this.updateInputDelayState}
                         deleteSelectedColumn={this.deleteSelectedColumn}
                         onDrag={this.onDrag}
                         drop={this.drop}
+                        images={this.state.images}
                       />
             })
           }

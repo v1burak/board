@@ -6,7 +6,8 @@ import './Col.css';
 
 const TYPES = {
   frame: 'frame',
-  video: 'video'
+  video: 'video',
+  slider: 'slider'
 }
 
 class Col extends Component {
@@ -14,6 +15,7 @@ class Col extends Component {
     dragging: false,
     type: this.props.type,
     inputValue: this.props.inputValue,
+    inputDelayValue: this.props.config.delay
   }
 
   componentDidMount () {
@@ -60,6 +62,43 @@ class Col extends Component {
     e.preventDefault()
   };
 
+  handleInputDelayChange = (event) => {
+    this.setState({
+      inputDelayValue: event.target.value
+    })
+
+    this.props.updateInputDelayState(this.props.row, this.props.id, event.target.value);
+  }
+
+  handleSelectChange = event => {
+    var select = event.target;
+    var selected = [...select.options]
+      .filter(option => option.selected)
+      .map(option => option.value);
+
+    this.setState({
+      selectedImages: selected
+    });
+
+    this.props.updateSelectImageState(this.props.row, this.props.id, selected);
+  }
+
+  returnSliderTemplate = () => {
+    const imagesOptions = this.props.images.map((image) => {
+      return (
+        <option value={image.fileName}>{image.fileName}</option>
+      )
+    })
+    return (
+      <>
+        <select className="form-control form-select" multiple onChange={this.handleSelectChange}>
+        {imagesOptions}
+        </select>
+        <input className="form-control input" type="text" placeholder="Slider delay" value={this.state.inputDelayValue} onChange={this.handleInputDelayChange} />
+      </>
+    )
+  }
+
   render() {
     const { select_column, config, deleteSelectedColumn, row, id, onDrag, drop } = this.props;
     const { dragging } = this.state;
@@ -102,8 +141,11 @@ class Col extends Component {
               <option value="video">
                 Video
               </option>
+              <option value="slider">
+                Slider
+              </option>
             </select>
-            
+            {this.state.type === 'slider' ? this.returnSliderTemplate() : null}
             <input className="form-control input" type="text" placeholder="Url/StartPosition" value={this.state.inputValue} onChange={this.handleInputChange} />
           </div>
           <span 

@@ -1,7 +1,8 @@
 import React, { PureComponent } from "react";
 import SocketIOClient from 'socket.io-client';
+import Slider from "react-slick";
 
-import { SOCKET_HOST, SOCKET_PORT, API_URL } from './helper/Config';
+import { SOCKET_HOST, SOCKET_PORT, API_URL, MEDIA_URL } from './helper/Config';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import VideoBox from "./components/VideoBox";
@@ -9,11 +10,11 @@ import "./App.css";
 
 const CONFIG_TYPES = {
 	VIDEO: 'video',
-	FRAME: 'frame'
+	FRAME: 'frame',
+	SLIDER: 'slider'
 }
 
 export default class extends PureComponent {
-
 	i = 0;
 	base64Videos = [];
 	tmpBase64Videos = [];
@@ -40,7 +41,8 @@ export default class extends PureComponent {
 			}],
 			currentVideoIndexes: [],
 			controls: [],
-			enabled: true
+			enabled: true,
+			images: []
 		};
 	}
 
@@ -64,6 +66,7 @@ export default class extends PureComponent {
 
 		this.getConfig();
 		this.fetchAllVideos();
+		this.fetchAllImages();
 	}
 
 	getConfig() {
@@ -88,6 +91,13 @@ export default class extends PureComponent {
 			this.updated = false;
 			this.convertUrlTObase64(data.data);
 			this.setState({videoIsReturned : true});
+		});
+	}
+
+	fetchAllImages() {
+		fetch(API_URL + 'images').then(response => response.json())
+		.then(data => {
+			this.setState({images : data.data});
 		});
 	}
 
@@ -121,6 +131,8 @@ export default class extends PureComponent {
 				return this.getVideoTemplate(i, index, item);		
 			} else if (item.type === CONFIG_TYPES.FRAME) {
 				return this.getFrameTemplate(item.url, index, item);
+			} else if (item.type === CONFIG_TYPES.SLIDER) {
+				return this.getSliderTemplate(i, index, item);
 			}
 
 			return null;
@@ -153,6 +165,50 @@ export default class extends PureComponent {
 		return (
 			<div className="frame-wrapper" key={index} data-width={width} data-height={height}>
 				<iframe src={url} id="myIFrame" title="MyFrame" referrerPolicy="no-referrer" className="frame"></iframe>
+			</div>
+		);
+	}
+
+	getSliderTemplate(i, index, params) {
+		const width = params.width ? params.width : '100';
+		const height = params.height ? params.height : '100';
+		const settings = {
+			dots: false,
+			infinite: true,
+			speed: 500,
+			autoplaySpeed: params.delay ? params.delay : 3000,
+			autoplay: true,
+			slidesToShow: 1,
+			slidesToScroll: 1
+		};
+		let imagesArray = this.state.images;
+
+		const firstHalf = imagesArray.slice(0, params.startPosition)
+		const secondHalf = imagesArray.slice(-params.startPosition);
+
+		imagesArray = secondHalf.concat(firstHalf);
+		
+		const imagesList = imagesArray.map((image) => {
+			let imageObj;
+
+			params.images.forEach((img) => {
+				if (image.fileName === img.fileName) {
+					imageObj = image;
+				}
+			})
+
+			return (
+				<div className="slide_item">
+					<img src={MEDIA_URL + imageObj.fileName} alt={imageObj.fileName} className="slide_image"/>
+				</div>
+			);
+		})
+
+		return (
+			<div key={index} data-width={width} data-height={height}>
+				<Slider {...settings}>
+				{imagesList}
+				</Slider>
 			</div>
 		);
 	}
