@@ -3,8 +3,10 @@ var express = require('express'),
 	cors = require('cors');
 let VideoRoute = require('./routes/VideoRoute');
 let ConfigRoute = require('./routes/ConfigRoute');
+let ImageRoute = require('./routes/ImageRoute');
 let VideoController = require('./controllers/VideoController');
 let ConfigController = require('./controllers/ConfigController');
+let ImageController = require('./controllers/ImageController');
 var sockets = [];
 const app = express();
 var port = process.env.EXPRESS_PORT;
@@ -29,6 +31,8 @@ const server = app.listen(port, () => {
 
 	app.use('/api', VideoRoute);
 	app.use('/api', ConfigRoute);
+	app.use('/api', ImageRoute);
+	app.use('/media', express.static(__dirname + '/images'));
 	app.use(express.static(__dirname));
 });
 	
@@ -67,6 +71,22 @@ var fileWatcher = () => {
 			io.sockets.emit('videos', { videos: videosJSON.data });
 		}
 	})
+
+	watcher.on('add', async function () {
+		const imagesJSON = await ImageController.getImagesFromDirectory();
+
+		if (!imagesJSON.error) {
+			io.sockets.emit('images', { images: imagesJSON.data });
+		}
+	})
+
+	watcher.on('change', async function () {
+		const imagesJSON = await ImageController.getImagesFromDirectory();
+
+		if (!imagesJSON.error) {
+			io.sockets.emit('images', { images: imagesJSON.data });
+		}
+	})
 };
 
 var configWatcher = () => {
@@ -85,7 +105,7 @@ setInterval( async function(){
     var hour = new Date().getHours();
 	var timer = await ConfigController.getTimer();
 
-    if (hour >= timer.startTime && hour < timer.offTime) {
+    if (hour >= timer.data.startTime && hour < timer.data.offTime) {
         io.sockets.emit('cron', { enabled: true });
     } else {
 		io.sockets.emit('cron', { enabled: false });

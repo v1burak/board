@@ -1,1 +1,1 @@
-[]
+[{"type":"video","height":30,"width":100,"startPosition":1},{"type":"frame","height":40,"width":100,"url":"https://tympanus.net/Development/Interactive3DMallMap/"},{"type":"slider","height":30,"width":100,"images":[{"fileName":"slider1.jpg"},{"fileName":"slider2.jpeg"}],"delay":5000,"startPosition":1}]

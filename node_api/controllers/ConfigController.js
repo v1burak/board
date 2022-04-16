@@ -49,7 +49,6 @@ module.exports.auth = async (req, res, next) => {
 
 module.exports.changeTimer = async (req, res, next) => {
     const timer = req.body;
-    console.log(req.body);
 
     fs.readFile(TIMER_PATH, 'utf-8', function(err, data){
         if (err) throw err;
@@ -64,7 +63,6 @@ module.exports.changeTimer = async (req, res, next) => {
 
 module.exports.changeConfig = async (req, res, next) => {
     const config = req.body;
-    console.log(req.body);
 
     fs.readFile(CONFIG_PATH, 'utf-8', function(err, data){
         if (err) throw err;
