@@ -2,7 +2,7 @@ import React, { PureComponent } from "react";
 import SocketIOClient from 'socket.io-client';
 import Slider from "react-slick";
 
-import { SOCKET_HOST, SOCKET_PORT, API_URL, MEDIA_URL } from './helper/Config';
+import { API_PORT, SOCKET_PORT } from './helper/Config';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import VideoBox from "./components/VideoBox";
@@ -47,7 +47,7 @@ export default class extends PureComponent {
 	}
 
 	componentDidMount() {
-		this.socket = SocketIOClient(SOCKET_HOST + ':' + SOCKET_PORT);
+		this.socket = SocketIOClient(window.location.hostname + ':' + SOCKET_PORT);
 		this.socket.on('videos', (data) => {
 			this.tmpBase64Videos = [];
 			this.i = 0;
@@ -70,7 +70,7 @@ export default class extends PureComponent {
 	}
 
 	getConfig() {
-		fetch(API_URL + 'config').then(response => response.json())
+		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/config').then(response => response.json())
 		.then(data => {
 			this.setState({config : data});
 			this.setState({
@@ -83,7 +83,7 @@ export default class extends PureComponent {
 	}
 
 	fetchAllVideos() {
-		fetch(API_URL + 'videos').then(response => response.json())
+		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/videos').then(response => response.json())
 		.then(data => {
 			this.tmpBase64Videos = [];
 			this.i = 0;
@@ -95,7 +95,7 @@ export default class extends PureComponent {
 	}
 
 	fetchAllImages() {
-		fetch(API_URL + 'images').then(response => response.json())
+		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/images').then(response => response.json())
 		.then(data => {
 			this.setState({images : data.data});
 		});
@@ -199,7 +199,7 @@ export default class extends PureComponent {
 
 			return (
 				<div className="slide_item">
-					<img src={MEDIA_URL + imageObj.fileName} alt={imageObj.fileName} className="slide_image"/>
+					<img src={'http://' + window.location.hostname + ':' + API_PORT + '/media/' + imageObj.fileName} alt={imageObj.fileName} className="slide_image"/>
 				</div>
 			);
 		})
@@ -246,11 +246,11 @@ export default class extends PureComponent {
 	};
 
 	checkUpdate() {
-		fetch(API_URL + 'videos').then(response => response.json())
+		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/videos').then(response => response.json())
 		.then(data => {
 			this.updated = !this.equals(this.videos, data.data);
 		});
-		fetch(API_URL + 'config').then(response => response.json())
+		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/config').then(response => response.json())
 		.then(data => {
 			this.updatedConfig = !this.equals(this.state.config, data);
 		});

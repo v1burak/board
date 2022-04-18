@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import Row from './components/setting/row/Row.js';
 import Col from './components/setting/col/Col.js';
 import Login from './components/setting/login/Login.js';
-import { API_URL } from './helper/Config';
+import { API_PORT } from './helper/Config';
 
 import './App.css';
 
@@ -55,14 +55,14 @@ class Setting extends Component {
   }
 
   fetchAllImages() {
-		fetch(API_URL + 'images').then(response => response.json())
+		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/images').then(response => response.json())
 		.then(data => {
 			this.setState({images : data.data});
 		});
 	}
 
   getConfig = () => {
-		fetch(API_URL + 'config').then(response => response.json())
+		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/config').then(response => response.json())
 		.then(data => {
       if (data.length) {
         this.setState({
@@ -531,7 +531,7 @@ class Setting extends Component {
       previewModalState: !this.state.previewModalState
     });
 
-    await this.postData(API_URL + 'config', rows);
+    await this.postData('http://' + window.location.hostname + ':' + API_PORT + '/api/config', rows);
   }
 
   postData = async (url = '', data = []) => {
@@ -737,7 +737,7 @@ class Setting extends Component {
       timerModalState: !this.state.timerModalState
     });
 
-    await this.postData(API_URL + 'config/timer', timer);
+    await this.postData('http://' + window.location.hostname + ':' + API_PORT + '/api/config/timer', timer);
   }
 
   timerModal = () => {
