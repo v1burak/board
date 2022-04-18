@@ -1,4 +1,4 @@
-version: "1.0"
+version: "3.3"
 services:
   web:
     build: ./front
@@ -15,6 +15,17 @@ services:
       - "3002:3002"
     networks: 
      - network-backend
+    volumes:
+      - type: bind
+        source: /home/mihanich/board/video
+        target: /home/mihanich/prod/video
+      - type: bind
+        source: /home/mihanich/board/images
+        target: /home/mihanich/prod/images
+      - type: bind
+        source: /home/mihanich/board/config
+        target: /home/mihanich/prod/config
+
 
 networks:
   network-backend:
