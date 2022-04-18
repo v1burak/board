@@ -327,6 +327,13 @@ class Setting extends Component {
         const newCol = row.cols.map((col, i) => {
           if (index === i) {
             col.type = value;
+
+            if (col.type === 'slider') {
+              col.images = [];
+            } else {
+              delete col.images;
+            }
+
             return col
           } else {
             return col
@@ -405,7 +412,7 @@ class Setting extends Component {
     e.stopPropagation();
 
     const data = JSON.parse(e.dataTransfer.getData('col'));
-    const movingCol = this.state.rows[data.row - 1].cols[data.id];
+    const movingCol = this.state.rows[data.row].cols[data.id];
 
     document.querySelectorAll('.col-drag-item').forEach(el => el.classList.remove('col-drag-item'));
 
@@ -751,12 +758,12 @@ class Setting extends Component {
             <div className="modal-body m-preview">
             <form>
                 <div className="form-group">
-                  <label htmlFor="recipient-name" className="col-form-label">Start:</label>
-                  <input type="number" className="form-control" value={this.state.timerStart} onChange={this.handleChangeStart} />
+                  <label className="col-form-label">Start:</label>
+                  <input type="number" className="form-control" min="0" max="23" value={this.state.timerStart} onChange={this.handleChangeStart} />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="recipient-name" className="col-form-label">End:</label>
-                  <input type="number" className="form-control" value={this.state.timerEnd} onChange={this.handleChangeEnd}/>
+                  <label className="col-form-label">End:</label>
+                  <input type="number" className="form-control" min="0" max="23" value={this.state.timerEnd} onChange={this.handleChangeEnd}/>
                 </div>
               </form>
             </div>
@@ -788,7 +795,7 @@ class Setting extends Component {
     }
     
     return (
-      <div className="app" key="setting">
+      <div className="app">
         <div className={`grid`}>
           {this.state.startGenerating ? this.createLayout() : this.generateGridModal()}
           <div

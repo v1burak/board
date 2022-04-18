@@ -176,7 +176,7 @@ export default class extends PureComponent {
 			dots: false,
 			infinite: true,
 			speed: 500,
-			autoplaySpeed: params.delay ? params.delay : 3000,
+			autoplaySpeed: params.delay ? Number(params.delay) : 3000,
 			autoplay: true,
 			slidesToShow: 1,
 			slidesToScroll: 1
@@ -196,6 +196,10 @@ export default class extends PureComponent {
 					imageObj = image;
 				}
 			})
+
+			if (!imageObj) {
+				return;
+			}
 
 			return (
 				<div className="slide_item">

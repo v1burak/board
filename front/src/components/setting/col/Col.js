@@ -21,6 +21,12 @@ class Col extends Component {
   componentDidMount () {
     ReactDOM.findDOMNode(this).style.removeProperty('height');
     ReactDOM.findDOMNode(this).style.removeProperty('width');
+
+    if (this.props.config.type === 'slider') {
+      this.setState({
+        selectedImages: this.props.config.images.map(img => img.fileName)
+      })
+    }
   }
 
   startResize = (e, direction, ref) => {
@@ -64,10 +70,10 @@ class Col extends Component {
 
   handleInputDelayChange = (event) => {
     this.setState({
-      inputDelayValue: event.target.value
+      inputDelayValue: Number(event.target.value) * 1000
     })
 
-    this.props.updateInputDelayState(this.props.row, this.props.id, event.target.value);
+    this.props.updateInputDelayState(this.props.row, this.props.id, Number(event.target.value) * 1000);
   }
 
   handleSelectChange = event => {
@@ -80,21 +86,23 @@ class Col extends Component {
       selectedImages: selected
     });
 
-    this.props.updateSelectImageState(this.props.row, this.props.id, selected);
+    this.props.updateSelectImageState(this.props.row, this.props.id, selected.map(option => {
+      return {fileName: option}
+    }));
   }
 
   returnSliderTemplate = () => {
-    const imagesOptions = this.props.images.map((image) => {
+    const imagesOptions = this.props.images.map((image, index) => {
       return (
-        <option value={image.fileName}>{image.fileName}</option>
+        <option value={image.fileName} key={index}>{image.fileName}</option>
       )
     })
     return (
       <>
-        <select className="form-control form-select" multiple onChange={this.handleSelectChange}>
+        <select className="form-control form-select" multiple value={this.state.selectedImages} onChange={this.handleSelectChange}>
         {imagesOptions}
         </select>
-        <input className="form-control input" type="text" placeholder="Slider delay" value={this.state.inputDelayValue} onChange={this.handleInputDelayChange} />
+        <input className="form-control input" type="number" placeholder="Slider delay" step="0.1" value={this.state.inputDelayValue / 1000} onChange={this.handleInputDelayChange} />
       </>
     )
   }
