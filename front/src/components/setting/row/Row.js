@@ -20,7 +20,7 @@ class Row extends Component {
     const height = row.height ? Math.round(row.height) : 20;
 
     return (
-      <div className="row-component" key={id} data-height-row={height}>
+      <div className="row-component" key={id}>
         <div className="row-control">
           <div>
             <span
@@ -63,7 +63,6 @@ class Row extends Component {
           onClick={() => select_row(id)}
           className="row row-content"
           droppable="true"
-          data-height-row={height}
         >
           {this.props.children}
         </div>

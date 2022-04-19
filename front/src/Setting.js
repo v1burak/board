@@ -244,10 +244,16 @@ class Setting extends Component {
   };
 
   deleteSelectedColumn = (colId, colRow) => {
+
     const rows = this.state.rows.map(row => {
       if (row.row_number === colRow) {
         row.cols = row.cols.filter((col, i) => {
           return colId !== i
+        });
+        row.cols = row.cols.map((col) => {
+          col.width = 12 / row.cols.length;
+
+          return col;
         })
         return row;
       } else {
@@ -629,7 +635,6 @@ class Setting extends Component {
             </div>
             <div className="modal-footer">
               <button className="btn btn-secondary" onClick={this.startGeneratingModalToggle}>Close Modal</button>
-              <button className="btn btn-secondary" onClick={this.handleLogout}>Logout</button>
               <button className="btn btn-primary" onClick={this.handleSubmit}>Generate</button>
             </div>
           </div>
@@ -642,7 +647,6 @@ class Setting extends Component {
     const grid = []
     this.state.rows.forEach((row, i) => {
       grid.push(
-        <>
         <Row 
           select_row={this.selectRow} 
           key={i} 
@@ -680,7 +684,6 @@ class Setting extends Component {
             })
           }
         </Row>
-        </>
       )
     });
 
@@ -692,8 +695,26 @@ class Setting extends Component {
       return (
         <div className="row previewRow" data-row-height={row.height}>
           {row.cols.map(col => {
+            let iconClass = '';
+
+            switch (col.type) {
+              case 'slider':
+                iconClass = 'glyphicon-camera';
+                break;
+              case 'frame':
+                iconClass = 'glyphicon-cloud';
+                break;
+              case 'video':
+              default:
+                iconClass = 'glyphicon-film';
+                break;
+            }
+
             return (
-              <div className={'col-'+ col.width + ' previewCol'}></div>
+              <div className={'col-'+ col.width + ' previewCol'}>
+                <span className={'glyphicon ' + iconClass}></span>
+                <div className="previewRow-type">{col.type}</div>
+              </div>
             )
           })}
         </div>
@@ -805,19 +826,26 @@ class Setting extends Component {
               onClick={this.previewModalToggle}
               className="glyphicon glyphicon-floppy-disk save-button btn-icon"
             >
-              <span class="subtitle-btn">Save changes</span>
+              <span className="subtitle-btn">Save changes</span>
             </span>
             <span title="Edit timer"
               className="glyphicon glyphicon-wrench timer-button btn-icon"
               onClick={this.timerModalToggle}
               >
-                <span class="subtitle-btn">Edit timer</span>
+                <span className="subtitle-btn">Edit timer</span>
             </span>
             <span title="Edit grid"
               className="glyphicon glyphicon-th grid-button btn-icon"
               onClick={this.startGeneratingModalToggle}
               >
-                <span class="subtitle-btn">Edit grid</span>
+                <span className="subtitle-btn">Edit grid</span>
+            </span>
+            <span
+              title="Logout"
+              onClick={this.handleLogout}
+              className="glyphicon glyphicon-remove logout-button btn-icon"
+            >
+              <span className="subtitle-btn">Logout</span>
             </span>
         </div>
         {this.state.previewModalState ? this.previewModal() : null}
