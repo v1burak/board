@@ -41,7 +41,6 @@ var io = require('socket.io')(http);
 var chokidar = require('chokidar');
 let dir = "./video";
 let config = "./config/config.json";
-let path = `${process.env.EXPRESS_SCHEME}${process.env.EXPRESS_HOST}:${process.env.EXPRESS_PORT}/data/activeVideoes/`;
 io.on('connection', (socket) => {
 	console.log(`connected ${socket.id}`);
 	sockets.push(socket.id);
@@ -102,10 +101,15 @@ var configWatcher = () => {
 }
 
 setInterval( async function(){ 
-    var hour = new Date().getHours();
 	var timer = await ConfigController.getTimer();
+	var startTime = timer.data.startTime;
+	var offTime = timer.data.offTime;
+	const start = startTime[0] * 60 + startTime[1];
+	const end =  offTime[0] * 60 + offTime[1];
+	const date = new Date(); 
+	const now = date.getHours() * 60 + date.getMinutes();
 
-    if (hour >= timer.data.startTime && hour < timer.data.offTime) {
+    if (start <= now && now <= end) {
         io.sockets.emit('cron', { enabled: true });
     } else {
 		io.sockets.emit('cron', { enabled: false });
