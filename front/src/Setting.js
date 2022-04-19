@@ -8,32 +8,7 @@ import './App.css';
 
 class Setting extends Component {
   state = {
-    rows: [
-      {
-        row_number: 1,
-        cols: [
-          {width: 4},
-          {width: 4},
-          {width: 4}
-        ]
-      },
-      {
-        row_number: 2,
-        cols: [
-          {width: 4},
-          {width: 4},
-          {width: 4}
-        ]
-      },
-      {
-        row_number: 3,
-        cols: [
-          {width: 4},
-          {width: 4},
-          {width: 4}
-        ]
-      },
-    ],
+    rows: [],
     selected_col: {},
     selected_row: null,
     startGenerating: false,
@@ -43,8 +18,8 @@ class Setting extends Component {
     tempHeight: 0,
     previewModalState: false,
     timerModalState: false,
-    timerStart: 9,
-    timerEnd: 23,
+    timerStart: ['00', '00'],
+    timerEnd: ['23', '59'],
     token: sessionStorage.getItem('auth'),
     images: []
   }
@@ -58,6 +33,8 @@ class Setting extends Component {
 		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/images').then(response => response.json())
 		.then(data => {
 			this.setState({images : data.data});
+		}).catch(error => {
+			alert(error);
 		});
 	}
 
@@ -70,12 +47,14 @@ class Setting extends Component {
         })
         this.generateGridByConfig(data);
       }
+		}).catch(error => {
+			alert(error);
 		});
 	}
 
   generateGridByConfig = (config) => {
     const rows = [{
-      row_number: 0,
+      row_number: 1,
       cols: []
     }];
 
@@ -89,7 +68,7 @@ class Setting extends Component {
         widthCounter = row.width;
 
         rows[counter] = {
-          row_number: counter,
+          row_number: counter + 1,
           height: row.height
         };
 
@@ -131,9 +110,10 @@ class Setting extends Component {
     if (option === 'add') {
       if (!this.state.rows.length) {
         return this.setState({
-          rows: this.state.rows.concat({row_number: 1, cols: [], height: 20})
+          rows: this.state.rows.concat({row_number: 1, cols: [], height: 100})
         })
       }
+
       this.setState({
         rows: this.state.rows.concat({row_number: this.state.rows[this.state.rows.length - 1].row_number + 1, height: 25, cols: []})
       })
@@ -185,18 +165,24 @@ class Setting extends Component {
   };
 
   addOneColumn = (row_num) => {
-    const rows = this.state.rows.map(row => {
-      if (row.row_number === row_num) {
-        row.cols.push({width: 4, type: 'video', value: 1})
-        return row
-      } else {
-        return row
-      }
-    })
+    const widthArray = this.state.rows[row_num - 1].cols.map((col) => {
+      return col.width;
+    }).reduce((partialSum, a) => partialSum + a, 0);
 
-    this.setState({
-      rows
-    })
+    if (widthArray < 12) {
+      const rows = this.state.rows.map(row => {
+        if (row.row_number === row_num) {
+          row.cols.push({width: (12 - widthArray), type: 'video', value: 1})
+          return row
+        } else {
+          return row
+        }
+      })
+  
+      this.setState({
+        rows
+      })
+    }
   }
 
   deleteSelectedRow = row_number => {
@@ -403,16 +389,13 @@ class Setting extends Component {
     })
   };
 
-  onDrag = (e, row, id) => {
-    e.dataTransfer.setData('col', JSON.stringify({row, id}));
-    e.target.classList.add('col-drag-item');
-  };
-
   drop = (e, row, id) => {
     e.stopPropagation();
 
     const data = JSON.parse(e.dataTransfer.getData('col'));
-    const movingCol = this.state.rows[data.row].cols[data.id];
+    const movingCol = this.state.rows[data.row].cols[data.id] || this.state.rows[data.row].cols[0];
+
+    console.log(movingCol);
 
     document.querySelectorAll('.col-drag-item').forEach(el => el.classList.remove('col-drag-item'));
 
@@ -466,22 +449,27 @@ class Setting extends Component {
         rows
       });
     }
+
   };
 
   handleChangeRow = (event) => {
-    this.setState({valueRow: Number(event.target.value)});
+    if (event.target.value < 5 && event.target.value >= 1) {
+      this.setState({valueRow: Number(event.target.value)});
+    }
   }
 
   handleChangeColumn = (event) => {
-    this.setState({valueColumn: Number(event.target.value)});
+    if (event.target.value < 5 && event.target.value >= 1) {
+      this.setState({valueColumn: Number(event.target.value)});
+    }
   }
 
   handleChangeStart = (event) => {
-    this.setState({timerStart: Number(event.target.value)});
+    this.setState({timerStart: event.target.value.split(':')});
   }
 
   handleChangeEnd = (event) => {
-    this.setState({timerEnd: Number(event.target.value)});
+    this.setState({timerEnd: event.target.value.split(':')});
   }
 
   handleSubmit = (event) => {
@@ -631,15 +619,16 @@ class Setting extends Component {
               <form>
                 <div className="form-group">
                   <label htmlFor="recipient-name" className="col-form-label">Row counter:</label>
-                  <input type="number" className="form-control" value={this.state.valueRow} onChange={this.handleChangeRow} />
+                  <input type="number" className="form-control" min={1} max={4} value={this.state.valueRow} onChange={this.handleChangeRow} />
                 </div>
                 <div className="form-group">
                   <label htmlFor="recipient-name" className="col-form-label">Column counter:</label>
-                  <input type="number" className="form-control" value={this.state.valueColumn} onChange={this.handleChangeColumn}/>
+                  <input type="number" className="form-control" min={1} max={4} value={this.state.valueColumn} onChange={this.handleChangeColumn}/>
                 </div>
               </form>
             </div>
             <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={this.startGeneratingModalToggle}>Close Modal</button>
               <button className="btn btn-secondary" onClick={this.handleLogout}>Logout</button>
               <button className="btn btn-primary" onClick={this.handleSubmit}>Generate</button>
             </div>
@@ -686,8 +675,6 @@ class Setting extends Component {
                         updateSelectImageState={this.updateSelectImageState}
                         updateInputDelayState={this.updateInputDelayState}
                         deleteSelectedColumn={this.deleteSelectedColumn}
-                        onDrag={this.onDrag}
-                        drop={this.drop}
                         images={this.state.images}
                       />
             })
@@ -724,6 +711,7 @@ class Setting extends Component {
               {rowsTemplate}
             </div>
             <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={this.previewModalToggle}>Close Modal</button>
               <button className="btn btn-primary" onClick={this.handleSaveConfig}>Save</button>
             </div>
           </div>
@@ -759,15 +747,16 @@ class Setting extends Component {
             <form>
                 <div className="form-group">
                   <label className="col-form-label">Start:</label>
-                  <input type="number" className="form-control" min="0" max="23" value={this.state.timerStart} onChange={this.handleChangeStart} />
+                  <input type="time" className="form-control" min="00:00" max="23:59" value={this.state.timerStart.join(':')} onChange={this.handleChangeStart} />
                 </div>
                 <div className="form-group">
                   <label className="col-form-label">End:</label>
-                  <input type="number" className="form-control" min="0" max="23" value={this.state.timerEnd} onChange={this.handleChangeEnd}/>
+                  <input type="time" className="form-control" min="00:00" max="23:59" value={this.state.timerEnd.join(':')} onChange={this.handleChangeEnd}/>
                 </div>
               </form>
             </div>
             <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={this.timerModalToggle}>Close Modal</button>
               <button className="btn btn-primary" onClick={this.handleSaveTimer}>Save</button>
             </div>
           </div>
@@ -779,6 +768,12 @@ class Setting extends Component {
   previewModalToggle = () => {
     this.setState({
       previewModalState: !this.state.previewModalState
+    })
+  }
+
+  startGeneratingModalToggle = () => {
+    this.setState({
+      startGenerating: !this.state.startGenerating
     })
   }
 
@@ -801,18 +796,29 @@ class Setting extends Component {
           <div
             className="row add-row"
             onClick={() => this.addRemoveLastRow('add')}
-          ></div>
+          ><span title="Add row"
+          className="glyphicon glyphicon-plus add-button"></span></div>
         </div>
         <div>
             <span
               title="Save changes"
               onClick={this.previewModalToggle}
-              className="glyphicon glyphicon-floppy-disk save-button"
-            ></span>
+              className="glyphicon glyphicon-floppy-disk save-button btn-icon"
+            >
+              <span class="subtitle-btn">Save changes</span>
+            </span>
             <span title="Edit timer"
-              className="glyphicon glyphicon-wrench timer-button"
+              className="glyphicon glyphicon-wrench timer-button btn-icon"
               onClick={this.timerModalToggle}
-              ></span>
+              >
+                <span class="subtitle-btn">Edit timer</span>
+            </span>
+            <span title="Edit grid"
+              className="glyphicon glyphicon-th grid-button btn-icon"
+              onClick={this.startGeneratingModalToggle}
+              >
+                <span class="subtitle-btn">Edit grid</span>
+            </span>
         </div>
         {this.state.previewModalState ? this.previewModal() : null}
         {this.state.timerModalState ? this.timerModal() : null}

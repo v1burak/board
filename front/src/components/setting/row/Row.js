@@ -11,7 +11,6 @@ class Row extends Component {
       addOneColumn,
       deleteSelectedRow,
       select_row,
-      drop,
       changeHeight,
       generateHeightModal,
       modalHeight,
@@ -21,7 +20,7 @@ class Row extends Component {
     const height = row.height ? Math.round(row.height) : 20;
 
     return (
-      <div className="row-component" key={id} data-height={height}>
+      <div className="row-component" key={id} data-height-row={height}>
         <div className="row-control">
           <div>
             <span
@@ -40,7 +39,7 @@ class Row extends Component {
           <div>
             <span
               title="Add new column"
-              onClick={() => addOneColumn(index)}
+              onClick={() => addOneColumn(id)}
               className="glyphicon glyphicon-plus"
             ></span>
           </div>
@@ -64,11 +63,11 @@ class Row extends Component {
           onClick={() => select_row(id)}
           className="row row-content"
           droppable="true"
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => drop(e, id)}
+          data-height-row={height}
         >
           {this.props.children}
         </div>
+        <div className="row-height">Height: {height}%</div>
       </div>
     );
   }

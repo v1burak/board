@@ -15,12 +15,11 @@ class Login extends Component {
 
     fetch(API_URL + 'config/auth').then(response => response.json())
     .then(data => {
-        if (data.login === this.state.login && data.password === this.state.password) {
+        if (data.login.toString() === this.state.login.toString() && data.password.toString() === this.state.password.toString()) {
             sessionStorage.setItem('auth', true);
             window.location.reload();
         } else {
             this.setState({error: 'Login Failed'});
-            sessionStorage.clear();
         }
     });
   }

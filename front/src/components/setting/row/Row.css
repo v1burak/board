@@ -49,6 +49,12 @@
   height: 35px;
   padding-left: 0px;
   margin: 5px 0px 5px 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 17px;
+  height: 100px;
+  background-color: rgb(90, 155, 252, 0.2);
 }
 
 .add-row:hover {
@@ -61,4 +67,31 @@
 
 .row-control > *:hover {
   cursor: pointer;
+}
+
+.row-height {
+  position: absolute;
+  top: 50%;
+  left: -50px;
+  transform: rotate(-90deg);
+  font-size: 12px;
+}
+
+.btn-icon:hover .subtitle-btn {
+  visibility: visible;
+  opacity: 1;
+  transform: translate(-20px, -50%);
+}
+
+.subtitle-btn {
+  position: absolute;
+  font-size: 14px;
+  white-space: nowrap;
+  top: 50%;
+  right: 100%;
+  transform: translate(0, -50%);
+  visibility: hidden;
+  opacity: 0;
+  transition: transform, opacity 0.8s ease-in-out;
+  color: black;
 }

@@ -79,6 +79,8 @@ export default class extends PureComponent {
 				currentVideos: this.getCurrentVideos(),
 				controls: this.getControls()
 			});
+		}).catch(error => {
+			alert(error);
 		});
 	}
 
@@ -91,6 +93,8 @@ export default class extends PureComponent {
 			this.updated = false;
 			this.convertUrlTObase64(data.data);
 			this.setState({videoIsReturned : true});
+		}).catch(error => {
+			alert(error);
 		});
 	}
 
@@ -98,6 +102,8 @@ export default class extends PureComponent {
 		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/images').then(response => response.json())
 		.then(data => {
 			this.setState({images : data.data});
+		}).catch(error => {
+			alert(error);
 		});
 	}
 
@@ -164,7 +170,7 @@ export default class extends PureComponent {
 
 		return (
 			<div className="frame-wrapper" key={index} data-width={width} data-height={height}>
-				<iframe src={url} id="myIFrame" title="MyFrame" referrerPolicy="no-referrer" className="frame"></iframe>
+				<iframe src={url} id="myIFrame" title="MyFrame" referrerPolicy="no-referrer" className="frame" data-height={height}></iframe>
 			</div>
 		);
 	}
@@ -183,12 +189,16 @@ export default class extends PureComponent {
 		};
 		let imagesArray = this.state.images;
 
+		if (!imagesArray.length) {
+			return false;
+		}
+
 		const firstHalf = imagesArray.slice(0, params.startPosition)
-		const secondHalf = imagesArray.slice(-params.startPosition);
+		const secondHalf = imagesArray.slice(params.startPosition);
 
 		imagesArray = secondHalf.concat(firstHalf);
 		
-		const imagesList = imagesArray.map((image) => {
+		const imagesList = imagesArray.map((image, index) => {
 			let imageObj;
 
 			params.images.forEach((img) => {
@@ -198,11 +208,11 @@ export default class extends PureComponent {
 			})
 
 			if (!imageObj) {
-				return;
+				return <></>;
 			}
 
 			return (
-				<div className="slide_item">
+				<div className="slide_item" key={index}>
 					<img src={'http://' + window.location.hostname + ':' + API_PORT + '/media/' + imageObj.fileName} alt={imageObj.fileName} className="slide_image"/>
 				</div>
 			);
@@ -253,10 +263,14 @@ export default class extends PureComponent {
 		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/videos').then(response => response.json())
 		.then(data => {
 			this.updated = !this.equals(this.videos, data.data);
+		}).catch(error => {
+			alert(error);
 		});
 		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/config').then(response => response.json())
 		.then(data => {
 			this.updatedConfig = !this.equals(this.state.config, data);
+		}).catch(error => {
+			alert(error);
 		});
 	}
 

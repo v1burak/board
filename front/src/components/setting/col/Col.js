@@ -15,7 +15,8 @@ class Col extends Component {
     dragging: false,
     type: this.props.type,
     inputValue: this.props.inputValue,
-    inputDelayValue: this.props.config.delay
+    inputDelayValue: this.props.config.delay,
+    selectedImages: []
   }
 
   componentDidMount () {
@@ -41,8 +42,8 @@ class Col extends Component {
     }, () => {
       const bootstrapWidth = Number(ref.style.width.split('p')[0]) / (e.path[5].clientWidth / 12) > 10.8 ? 12 : Math.round(Number(ref.style.width.split('p')[0]) / (e.path[5].clientWidth / 12))
 
-      this.props.changeColumnWidth(this.props.row, this.props.id, bootstrapWidth > 0 ? bootstrapWidth : 1);
-  
+      this.props.changeColumnWidth(this.props.row, this.props.id, bootstrapWidth > 0 ? bootstrapWidth : 12);
+
       ref.style.removeProperty('height');
       ref.style.removeProperty('width');
     })
@@ -76,11 +77,35 @@ class Col extends Component {
     this.props.updateInputDelayState(this.props.row, this.props.id, Number(event.target.value) * 1000);
   }
 
+  handleSelectAllChange = event => {
+    var selectedCheckbox = event.target.checked;
+    var selected = [];
+
+    if (selectedCheckbox) {
+      selected = this.props.images.map(img => img.fileName);
+    } else {
+      selected = [];
+    }
+
+    this.setState({
+      selectedImages: selected
+    });
+
+    this.props.updateSelectImageState(this.props.row, this.props.id, selected.map(option => {
+      return {fileName: option}
+    }));
+  }
+
   handleSelectChange = event => {
-    var select = event.target;
-    var selected = [...select.options]
-      .filter(option => option.selected)
-      .map(option => option.value);
+    var value = event.target.getAttribute('data-value');
+    var selectedCheckbox = event.target.checked;
+    var selected = this.state.selectedImages;
+
+    if (selectedCheckbox) {
+      selected.push(value)
+    } else {
+      selected.splice(selected.findIndex(e => e === value),1);
+    }
 
     this.setState({
       selectedImages: selected
@@ -92,23 +117,44 @@ class Col extends Component {
   }
 
   returnSliderTemplate = () => {
+    if (!this.props.images.length) {
+      return false;
+    }
+
     const imagesOptions = this.props.images.map((image, index) => {
+      const checked = this.state.selectedImages.filter(img => img === image.fileName).length;
+
       return (
-        <option value={image.fileName} key={index}>{image.fileName}</option>
+        <label className="switch" key={index}>
+          <input className="switch__input" type="checkbox" data-value={image.fileName} checked={checked} onChange={this.handleSelectChange}/>
+          <i className="switch__icon"></i>
+          <span className="switch__span">{image.fileName}</span>
+        </label>
       )
     })
     return (
       <>
-        <select className="form-control form-select" multiple value={this.state.selectedImages} onChange={this.handleSelectChange}>
-        {imagesOptions}
-        </select>
-        <input className="form-control input" type="number" placeholder="Slider delay" step="0.1" value={this.state.inputDelayValue / 1000} onChange={this.handleInputDelayChange} />
+        <div className="form-group col-12">
+          <label className="form-label">Please choose an image</label>
+          <div className="switch-list">
+            <label className="switch">
+              <input className="switch__input" type="checkbox" onChange={this.handleSelectAllChange}/>
+              <i className="switch__icon"></i>
+              <span className="switch__span">Select all</span>
+            </label>
+            {imagesOptions}
+          </div>
+        </div>
+        <div className="form-group col-12">
+          <label className="form-label">Please choose delay time (seconds)</label>
+          <input className="form-control input" type="number" placeholder="Slider delay" step="0.1" value={this.state.inputDelayValue / 1000} onChange={this.handleInputDelayChange} />
+        </div>
       </>
     )
   }
 
   render() {
-    const { select_column, config, deleteSelectedColumn, row, id, onDrag, drop } = this.props;
+    const { select_column, config, deleteSelectedColumn, row, id } = this.props;
     const { dragging } = this.state;
 
     let colSizes = `col-${config.width} `;
@@ -121,7 +167,7 @@ class Col extends Component {
     return (
       <Resizable 
         onClick={() => select_column({...config, ...colInfo})}
-        className={`${colSizes} col no-gutter ${dragging ? 'no-transition' : null}`}
+        className={`${colSizes} col no-gutter ${dragging ? 'no-transition' : ''}`}
         enable={{ 
           top: false, 
           right: true, 
@@ -135,31 +181,35 @@ class Col extends Component {
         bounds={'parent'}
         onResizeStop={this.reSize}
         onResizeStart={this.startResize} 
-        onDragStart={e => onDrag(e, row, id)}
-        onDragOver={this.dragOver}
-        onDrop={e => drop(e, row, id)}
         key={id}
       >
         <div draggable className="col-inner">
           <div className="col-sizes">
-            <select className="form-control select" value={this.state.type} onChange={this.handleChange}>
-              <option value="frame">
-                Frame
-              </option>
-              <option value="video">
-                Video
-              </option>
-              <option value="slider">
-                Slider
-              </option>
-            </select>
+            <div className="form-group col-12">
+              <label className="form-label">Select type of element</label>
+              <select className="form-control select" value={this.state.type} onChange={this.handleChange}>
+                <option value="frame">
+                  Frame
+                </option>
+                <option value="video">
+                  Video
+                </option>
+                <option value="slider">
+                  Slider
+                </option>
+              </select>
+            </div>
             {this.state.type === 'slider' ? this.returnSliderTemplate() : null}
-            <input className="form-control input" type="text" placeholder="Url/StartPosition" value={this.state.inputValue} onChange={this.handleInputChange} />
+            <div className="form-group col-12">
+              <label className="form-label">Please {this.state.type === 'frame' ? 'add iframe url': 'choose start position value'}</label>
+              <input className="form-control input" type={this.state.type === 'frame' ? 'text': 'number'} placeholder="Url/StartPosition" value={this.state.inputValue} onChange={this.handleInputChange} />
+            </div>
           </div>
           <span 
             className="glyphicon glyphicon-remove"
             onClick={() => deleteSelectedColumn(id, row)}
           ></span>
+          <div className="col-width">Width: {Math.floor((config.width / 12) * 100)}%</div>
         </div>
       </Resizable>
     );

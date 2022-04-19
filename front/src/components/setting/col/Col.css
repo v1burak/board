@@ -60,6 +60,83 @@
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  max-width: 80%;
-  height: 100%;
+  padding: 10px;
+}
+
+[data-height-row="5"] {
+  min-height: 5vh;
+}
+[data-height-row="10"] {
+  min-height: 10vh;
+}
+[data-height-row="15"] {
+  min-height: 15vh;
+}
+[data-height-row="20"] {
+  min-height: 20vh;
+}
+[data-height-row="25"] {
+  min-height: 25vh;
+}
+[data-height-row="30"] {
+  min-height: 30vh;
+}
+[data-height-row="33"] {
+  min-height: 33.33vh;
+}
+[data-height-row="35"] {
+  min-height: 35vh;
+}
+[data-height-row="40"] {
+  min-height: 40vh;
+}
+[data-height-row="45"] {
+  min-height: 45vh;
+}
+[data-height-row="50"] {
+  min-height: 50vh;
+}
+[data-height-row="55"] {
+  min-height: 55vh;
+}
+[data-height-row="60"] {
+  min-height: 60vh;
+}
+
+[data-height-row="67"] {
+  min-height: 66.66vh;
+}
+[data-height-row="65"] {
+  min-height: 65vh;
+}
+[data-height-row="70"] {
+  min-height: 70vh;
+}
+[data-height-row="75"] {
+  min-height: 75vh;
+}
+[data-height-row="80"] {
+  min-height: 80vh;
+}
+[data-height-row="85"] {
+  min-height: 85vh;
+}
+[data-height-row="90"] {
+  min-height: 90vh;
+}
+[data-height-row="95"] {
+  min-height: 95vh;
+}
+[data-height-row="100"] {
+  min-height: 100vh;
+}
+
+[data-height-row] {
+  height: auto;
+}
+
+.col-width {
+  color: white;
+  font-size: 13px;
+  text-align: center;
 }
