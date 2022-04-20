@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { API_URL } from '../../../helper/Config';
+import { API_PORT } from '../../../helper/Config';
 
 import './Login.css';
 
@@ -13,7 +13,7 @@ class Login extends Component {
   handleSubmit = (event) => {
     event.preventDefault();
 
-    fetch(API_URL + 'config/auth').then(response => response.json())
+    fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/config/auth').then(response => response.json())
     .then(data => {
         if (data.login.toString() === this.state.login.toString() && data.password.toString() === this.state.password.toString()) {
             sessionStorage.setItem('auth', true);
@@ -21,6 +21,8 @@ class Login extends Component {
         } else {
             this.setState({error: 'Login Failed'});
         }
+    }).catch(error => {
+      this.setState({error: error});
     });
   }
 

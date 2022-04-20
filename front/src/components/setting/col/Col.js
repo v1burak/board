@@ -13,7 +13,7 @@ const TYPES = {
 class Col extends Component {
   state = {
     dragging: false,
-    type: this.props.type,
+    type: this.props.config.type,
     inputValue: this.props.inputValue,
     inputDelayValue: this.props.config.delay,
     selectedImages: []
@@ -40,7 +40,21 @@ class Col extends Component {
     this.setState({
       dragging: false
     }, () => {
-      const bootstrapWidth = Number(ref.style.width.split('p')[0]) / (e.path[5].clientWidth / 12) > 10.8 ? 12 : Math.round(Number(ref.style.width.split('p')[0]) / (e.path[5].clientWidth / 12))
+      if (e.path) {
+        if (e.composedPath) {
+          console.log("Supports `path` and `composedPath`");
+        } else {
+          console.log("Supports `path` but not `composedPath`");
+        }
+      } else if (e.composedPath) {
+        console.log("Supports `composedPath` (but not `path`)");
+      } else {
+        console.log("Supports neither `path` nor `composedPath`");
+      }
+
+      var path = e.path || (e.composedPath && e.composedPath());
+
+      const bootstrapWidth = Number(ref.style.width.split('p')[0]) / (path[5].clientWidth / 12) > 10.8 ? 12 : Math.round(Number(ref.style.width.split('p')[0]) / (path[5].clientWidth / 12))
 
       this.props.changeColumnWidth(this.props.row, this.props.id, bootstrapWidth > 0 ? bootstrapWidth : 12);
 
@@ -187,7 +201,7 @@ class Col extends Component {
           <div className="col-sizes">
             <div className="form-group col-12">
               <label className="form-label">Select type of element</label>
-              <select className="form-control select" value={this.state.type} onChange={this.handleChange}>
+              <select className="form-control select" value={this.props.config.type} onChange={this.handleChange}>
                 <option value="frame">
                   Frame
                 </option>
@@ -199,10 +213,10 @@ class Col extends Component {
                 </option>
               </select>
             </div>
-            {this.state.type === 'slider' ? this.returnSliderTemplate() : null}
+            {this.props.config.type === 'slider' ? this.returnSliderTemplate() : null}
             <div className="form-group col-12">
-              <label className="form-label">Please {this.state.type === 'frame' ? 'add iframe url': 'choose start position value'}</label>
-              <input className="form-control input" type={this.state.type === 'frame' ? 'text': 'number'} placeholder="Url/StartPosition" value={this.state.inputValue} onChange={this.handleInputChange} />
+              <label className="form-label">Please {this.props.config.type === 'frame' ? 'add iframe url': 'choose start position value'}</label>
+              <input className="form-control input" type={this.props.config.type === 'frame' ? 'text': 'number'} placeholder="Url/StartPosition" value={this.props.config.value} onChange={this.handleInputChange} />
             </div>
           </div>
           <span 

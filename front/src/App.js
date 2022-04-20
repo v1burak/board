@@ -280,7 +280,7 @@ export default class extends PureComponent {
 			this.i++;
 			let isAlready = this.base64Videos.find(item => item.fileName === video.fileName);
 			if(!isAlready || isAlready.size !== video.size){
-				this.getBase64(video.file, video.fileName, (result) => {
+				this.getBase64('http://' + window.location.hostname + ':' + API_PORT + '/video/' + video.fileName, video.fileName, (result) => {
 					let encoded = {
 						file: result,
 						fileName: video.fileName,
@@ -288,7 +288,7 @@ export default class extends PureComponent {
 					};
 					this.tmpBase64Videos.push(encoded);
 					this.convertUrlTObase64(videos);
-		   		});
+				});
 			} else {
 				this.tmpBase64Videos.push(isAlready);
 				this.convertUrlTObase64(videos);

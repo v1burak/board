@@ -27,6 +27,7 @@ class Setting extends Component {
   componentDidMount() {
     this.getConfig();
     this.fetchAllImages();
+    this.getTimer();
   }
 
   fetchAllImages() {
@@ -37,6 +38,15 @@ class Setting extends Component {
 			alert(error);
 		});
 	}
+
+  getTimer() {
+    fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/config/timer').then(response => response.json())
+    .then(data => {
+      this.setState({timerStart: data.startTime, timerEnd: data.offTime});
+    }).catch(error => {
+			alert(error);
+		});
+  }
 
   getConfig = () => {
 		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/config').then(response => response.json())
@@ -114,8 +124,10 @@ class Setting extends Component {
         })
       }
 
+      let heightSum = this.state.rows.reduce((heightSum, row) => heightSum + row.height, 0);
+
       this.setState({
-        rows: this.state.rows.concat({row_number: this.state.rows[this.state.rows.length - 1].row_number + 1, height: 25, cols: []})
+        rows: this.state.rows.concat({row_number: this.state.rows[this.state.rows.length - 1].row_number + 1, height: 100 - heightSum, cols: []})
       })
     } else if (option === 'remove' && this.state.rows.length > 0) {
       this.setState({
