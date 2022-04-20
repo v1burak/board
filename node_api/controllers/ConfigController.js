@@ -28,6 +28,12 @@ module.exports.getConfig = async (req, res, next) => {
     res.send(JSON.parse(config));
 };
 
+module.exports.getTimerConfig = async (req, res, next) => {
+    let config = fs.readFileSync(TIMER_PATH);
+    res.send(JSON.parse(config));
+};
+
+
 module.exports.getTimer = () => {
     return new Promise((resolve, reject) => {
         try {
