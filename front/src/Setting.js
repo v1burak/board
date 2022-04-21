@@ -852,6 +852,13 @@ class Setting extends Component {
               >
                 <span className="subtitle-btn">Edit grid</span>
             </span>
+	    
+	      <a href="/files"
+              className="glyphicon glyphicon-transfer media-button btn-icon" target="_blank"
+              >
+                <span className="subtitle-btn">Edit media</span>
+            </a>
+	    
             <span
               title="Logout"
               onClick={this.handleLogout}
