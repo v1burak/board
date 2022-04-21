@@ -218,10 +218,18 @@ export default class extends PureComponent {
 			);
 		})
 
+		if (imagesList.filter(img => img.props.className).length === 1) {
+			return (
+				<div key={index} data-width={width} data-height={height} className="images-wrapper">
+					{imagesList}
+				</div>
+			)
+		}
+
 		return (
-			<div key={index} data-width={width} data-height={height}>
-				<Slider {...settings}>
-				{imagesList}
+			<div key={index} data-width={width} data-height={height} className="images-wrapper">
+				<Slider {...settings} key={`$.${index}`}>
+					{imagesList}
 				</Slider>
 			</div>
 		);

@@ -18,9 +18,10 @@ class Row extends Component {
     } = this.props;
 
     const height = row.height ? Math.round(row.height) : 20;
+    const select = row.cols.filter(col => col.type === "frame");
 
     return (
-      <div className="row-component" key={id}>
+      <div className={`row-component ${select.length ? 'm-select' : ''}`} key={id}>
         <div className="row-control">
           <div>
             <span

@@ -20,6 +20,11 @@ main {
 }
 
 .frame-wrapper {
+  z-index: 150 !important;
+}
+
+.frame-wrapper,
+.images-wrapper {
   position: relative;
   overflow: hidden;
   display: inline-block;
@@ -29,7 +34,8 @@ main {
   display: inline-block;
 }
 
-.frame-wrapper::before {
+.frame-wrapper::before,
+.images-wrapper::before {
   content: '';
   position: absolute;
   top: -10px;
@@ -39,7 +45,8 @@ main {
   box-shadow: 5px 12px 25px rgba(0, 0, 0, 0.6);
 }
 
-.frame-wrapper::after {
+.frame-wrapper::after,
+.images-wrapper::after {
   content: '';
   position: absolute;
   bottom: -10px;

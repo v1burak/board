@@ -1,0 +1,14 @@
+[data-test-id="toolbar-item--createFolder"],
+.oc-fm--toolbar__nav-buttons {
+    display: none;
+}
+
+.file_manager-images,
+.file_manager-videos {
+    display: inline-block;
+    width: 50%;
+}
+
+.oc-fm--toolbar__items:not(:last-child) {
+    margin-left: auto;
+}

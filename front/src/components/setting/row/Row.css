@@ -2,6 +2,10 @@
   position: relative;
 }
 
+.row-component.m-select {
+  z-index: 101;
+}
+
 .row-control {
   position: absolute;
   height: 132px;

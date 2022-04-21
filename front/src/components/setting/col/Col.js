@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import Resizable from 're-resizable';
+import CreatableSelect from 'react-select/creatable';
 
 import './Col.css';
 
@@ -40,18 +41,6 @@ class Col extends Component {
     this.setState({
       dragging: false
     }, () => {
-      if (e.path) {
-        if (e.composedPath) {
-          console.log("Supports `path` and `composedPath`");
-        } else {
-          console.log("Supports `path` but not `composedPath`");
-        }
-      } else if (e.composedPath) {
-        console.log("Supports `composedPath` (but not `path`)");
-      } else {
-        console.log("Supports neither `path` nor `composedPath`");
-      }
-
       var path = e.path || (e.composedPath && e.composedPath());
 
       const bootstrapWidth = Number(ref.style.width.split('p')[0]) / (path[5].clientWidth / 12) > 10.8 ? 12 : Math.round(Number(ref.style.width.split('p')[0]) / (path[5].clientWidth / 12))
@@ -77,6 +66,29 @@ class Col extends Component {
     })
 
     this.props.updateInputState(this.props.row, this.props.id, event.target.value);
+  }
+
+  handleSelectUrlChange = (state) => {
+    let list = this.getWithExpiry('frames');
+
+    this.setState({
+      inputValue: state.value
+    })
+
+
+    if (list) {
+      if (typeof list !== 'number') {
+        list.push(state.value);
+      } else {
+        list = [state.value];
+      }
+
+      this.setWithExpiry('frames', list);
+    } else {
+      this.setWithExpiry('frames', [state.value])
+    }
+
+    this.props.updateInputState(this.props.row, this.props.id, state.value);
   }
 
   dragOver = e => {
@@ -167,16 +179,62 @@ class Col extends Component {
     )
   }
 
+  setWithExpiry = (key, value, ttl = 86400 * 30) => {
+    const now = new Date()
+    const item = {
+        value: value,
+        expiry: now.getTime() + ttl,
+    }
+
+    localStorage.setItem(key, JSON.stringify(item))
+  }
+
+  getWithExpiry = (key) => {
+    const itemStr = localStorage.getItem(key)
+
+    if (!itemStr) {
+      return null
+    }
+
+    const item = JSON.parse(itemStr)
+    const now = new Date();
+
+    if (now.getTime() > item.expiry) {
+      localStorage.removeItem(key);
+
+      return null
+    }
+
+    return item.value
+  }
+
+
   render() {
     const { select_column, config, deleteSelectedColumn, row, id } = this.props;
     const { dragging } = this.state;
 
     let colSizes = `col-${config.width} `;
+    let controlInput;
 
     const colInfo = {
       id: this.props.id,
       row: this.props.row
     };
+
+    if (this.props.config.type === 'frame') {
+      const optionsList = this.getWithExpiry('frames');
+
+      const options = [
+        { value: this.props.config.value, label: this.props.config.value },
+        ...optionsList.map(option => {
+          return { value: option, label: option}
+        })
+      ];
+
+      controlInput = <CreatableSelect options={options} defaultValue={options[0]} isSearchable={true} onChange={this.handleSelectUrlChange} />;
+    } else {
+      controlInput = <input className="form-control input" type="number" placeholder="StartPosition" value={this.props.config.value} onChange={this.handleInputChange} />;
+    }
     
     return (
       <Resizable 
@@ -216,7 +274,7 @@ class Col extends Component {
             {this.props.config.type === 'slider' ? this.returnSliderTemplate() : null}
             <div className="form-group col-12">
               <label className="form-label">Please {this.props.config.type === 'frame' ? 'add iframe url': 'choose start position value'}</label>
-              <input className="form-control input" type={this.props.config.type === 'frame' ? 'text': 'number'} placeholder="Url/StartPosition" value={this.props.config.value} onChange={this.handleInputChange} />
+              {controlInput}
             </div>
           </div>
           <span 
