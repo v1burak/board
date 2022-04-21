@@ -1,5 +1,6 @@
 var express = require('express'),
 	bodyParser = require('body-parser'),
+	path = require('path'),
 	cors = require('cors');
 let VideoRoute = require('./routes/VideoRoute');
 let ConfigRoute = require('./routes/ConfigRoute');
@@ -10,6 +11,19 @@ let ImageController = require('./controllers/ImageController');
 var sockets = [];
 const app = express();
 var port = process.env.EXPRESS_PORT;
+let configFilesImages = {
+	fsRoot: path.resolve(__dirname, './images'),
+	rootName: 'Images',
+};
+let configFilesVideos = {
+	fsRoot: path.resolve(__dirname, './video'),
+	rootName: 'Videos',
+};
+
+console.log(process.env.WEB_HOST, port);
+
+let filemanager = require('@opuscapita/filemanager-server');
+
 app.use((req, res, next) => {
 	var _send = res.send;
 	var sent = false;
@@ -33,6 +47,8 @@ const server = app.listen(port, () => {
 	app.use('/api', ConfigRoute);
 	app.use('/api', ImageRoute);
 	app.use('/media', express.static(__dirname + '/images'));
+	app.use('/images', filemanager.middleware(configFilesImages));
+	app.use('/videos', filemanager.middleware(configFilesVideos));
 	app.use(express.static(__dirname));
 });
 	

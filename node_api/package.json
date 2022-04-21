@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@opuscapita/filemanager-server": "^1.1.12",
     "body-parser": "^1.18.3",
     "chokidar": "^2.1.2",
     "cors": "^2.8.5",
