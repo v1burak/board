@@ -18,14 +18,10 @@ services:
     volumes:
       - type: bind
         source: /home/mihanich/share/video
-        target: /home/mihanich/prod/node_api/video
+        target: /app/video
       - type: bind
         source: /home/mihanich/share/images
-        target: /home/mihanich/prod/node_api/images
-      - type: bind
-        source: /home/mihanich/board/node_api/config
-        target: /home/mihanich/prod/node_api/config
-
+        target: /app/images
 
 networks:
   network-backend:
