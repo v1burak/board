@@ -222,7 +222,11 @@ class Col extends Component {
     };
 
     if (this.props.config.type === 'frame') {
-      const optionsList = this.getWithExpiry('frames');
+      let optionsList = this.getWithExpiry('frames');
+
+      if (!optionsList) {
+        optionsList = [];
+      }
 
       const options = [
         { value: this.props.config.value, label: this.props.config.value },
