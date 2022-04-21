@@ -1037,6 +1037,7 @@ video {
 .save-button,
 .timer-button,
 .grid-button,
+.media-button,
 .logout-button {
   position: fixed;
   font-size: 20px;
@@ -1057,13 +1058,18 @@ video {
   top: 200px;
 }
 
-.logout-button {
+.media-button {
   top: 275px;
+}
+
+.logout-button {
+  top: 350px;
 }
 
 .save-button:hover,
 .timer-button:hover,
 .grid-button:hover,
+.media-button:hover,
 .logout-button:hover {
   background: rgba(90, 155, 252, 1);
   color: white;
