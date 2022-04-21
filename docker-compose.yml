@@ -8,6 +8,7 @@ services:
       - "3000:3000"
     networks:
       - network-backend
+    restart: always
   api:
     build: ./node_api
     ports:
@@ -15,6 +16,7 @@ services:
       - "3002:3002"
     networks: 
      - network-backend
+    restart: always
     volumes:
       - type: bind
         source: /home/mihanich/share/video
