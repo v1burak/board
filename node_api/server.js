@@ -66,6 +66,9 @@ io.on('connection', (socket) => {
 			sockets.splice(sockets.indexOf(socket.id), 1);
 		}
 	});
+	socket.on('refresh', function(data) {
+		io.sockets.emit('refresh');
+	})
 });
 
 var fileWatcher = () => {
