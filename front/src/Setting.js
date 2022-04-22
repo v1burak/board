@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
+import SocketIOClient from 'socket.io-client';
 import Row from './components/setting/row/Row.js';
 import Col from './components/setting/col/Col.js';
 import Login from './components/setting/login/Login.js';
-import { API_PORT } from './helper/Config';
+import { API_PORT, SOCKET_PORT } from './helper/Config';
 
 import './App.css';
 
@@ -816,6 +817,14 @@ class Setting extends Component {
     })
   }
 
+  handleRefreshPage = (event) => {
+    event.preventDefault();
+
+    this.socket = SocketIOClient(window.location.hostname + ':' + SOCKET_PORT);
+
+    this.socket.emit('refresh');
+}
+
   render() {
 
     if (!this.state.token) {
@@ -832,7 +841,7 @@ class Setting extends Component {
           ><span title="Add row"
           className="glyphicon glyphicon-plus add-button"></span></div>
         </div>
-        <div>
+        <div className="setting-navigation">
             <span
               title="Save changes"
               onClick={this.previewModalToggle}
@@ -852,13 +861,14 @@ class Setting extends Component {
               >
                 <span className="subtitle-btn">Edit grid</span>
             </span>
-	    
-	      <a href="/files"
-              className="glyphicon glyphicon-transfer media-button btn-icon" target="_blank"
-              >
-                <span className="subtitle-btn">Edit media</span>
+            <a href="/files" className="glyphicon glyphicon-transfer media-button btn-icon" target="_blank">
+              <span className="subtitle-btn">Edit media</span>
             </a>
-	    
+            <span title="Refresh board"
+                onClick={this.handleRefreshPage}
+                className="glyphicon glyphicon-refresh refresh-button btn-icon">
+                <span className="subtitle-btn">Refresh board</span>
+            </span>
             <span
               title="Logout"
               onClick={this.handleLogout}

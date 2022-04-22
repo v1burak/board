@@ -1038,7 +1038,8 @@ video {
 .timer-button,
 .grid-button,
 .media-button,
-.logout-button {
+.logout-button,
+.refresh-button {
   position: fixed;
   font-size: 20px;
   top: 50px;
@@ -1062,15 +1063,24 @@ video {
   top: 275px;
 }
 
-.logout-button {
+.refresh-button {
+  top: 125px;
+}
+
+.setting-navigation .refresh-button {
   top: 350px;
+}
+
+.logout-button {
+  top: 425px;
 }
 
 .save-button:hover,
 .timer-button:hover,
 .grid-button:hover,
 .media-button:hover,
-.logout-button:hover {
+.logout-button:hover,
+.refresh-button:hover {
   background: rgba(90, 155, 252, 1);
   color: white;
 }
@@ -1218,4 +1228,23 @@ video {
   margin-left: 5px;
   font-weight: 400;
   color: white;
+}
+
+.app.m-files {
+  display: flex;
+  width: 100%;
+}
+
+.files-box {
+  height: 480px;
+  flex: 1;
+}
+
+.files-navigations {
+  position: relative;
+  flex: 0 0 200px;
+}
+
+.files-navigations .logout-button {
+  top: 50px;
 }

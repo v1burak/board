@@ -60,6 +60,9 @@ export default class extends PureComponent {
 		this.socket.on('config', (data) => {
 			window.location.reload();
 		});
+		this.socket.on('refresh', (data) => {
+			window.location.reload();
+		});
 		this.socket.on('cron', (data) => {
 			this.setState({enabled : data.enabled});
 		});
@@ -198,7 +201,7 @@ export default class extends PureComponent {
 
 		imagesArray = secondHalf.concat(firstHalf);
 		
-		const imagesList = imagesArray.map((image, index) => {
+		let imagesList = imagesArray.map((image, index) => {
 			let imageObj;
 
 			params.images.forEach((img) => {
@@ -225,6 +228,8 @@ export default class extends PureComponent {
 				</div>
 			)
 		}
+
+		imagesList = imagesList.filter(img => img.props.className);
 
 		return (
 			<div key={index} data-width={width} data-height={height} className="images-wrapper">
