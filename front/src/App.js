@@ -348,7 +348,6 @@ export default class extends PureComponent {
 	}
 
 	selectVideo = (currentVideo, id) => {
-		console.log(currentVideo);
 		let currentVideoIndex =  this.base64Videos.findIndex(item => {
 			return item.fileName === currentVideo.fileName
 		});
@@ -357,8 +356,6 @@ export default class extends PureComponent {
 
 		currentVideoIndexes[id] = currentVideoIndex;
 		currentVideos[id] = currentVideo;
-
-		console.log(currentVideos);
 
 		this.setState({ currentVideos, currentVideoIndexes });
 	};
@@ -387,8 +384,6 @@ export default class extends PureComponent {
 			this.selectVideo(this.state.freshVideos[nextIndex], id);
 		} else {
 			let currentVideoIndexes = [...this.state.currentVideoIndexes];
-
-			console.log(currentVideoIndexes);
 
 			currentVideoIndexes[id] = 0;
 
