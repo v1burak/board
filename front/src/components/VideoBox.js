@@ -10,6 +10,7 @@ export default class extends PureComponent {
                     onEnded={this.props.onEnded}
                     id={this.props.id}
                     muted
+                    loop={this.props.videosCount === 1}
                 />
             </div>
         );

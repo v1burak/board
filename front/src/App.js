@@ -161,6 +161,7 @@ export default class extends PureComponent {
 					autoPlay={this.state.controls[i].autoPlay}
 					onEnded={this.onVideoEnd}
 					data={this.state.currentVideos[i]}
+					videosCount={this.state.freshVideos.length}
 					id={i}
 				/>
 			</div>
@@ -335,7 +336,11 @@ export default class extends PureComponent {
 		this.setState({ freshVideos: videos });
 		if (this.state.freshVideos.length) {
 			this.state.currentVideoIndexes.forEach((id, index) => {
-				this.selectVideo(this.state.freshVideos[id], index);
+				if (id >= this.state.freshVideos.length) {
+					this.selectVideo(this.state.freshVideos[this.state.freshVideos.length - 1], index);
+				} else {
+					this.selectVideo(this.state.freshVideos[id], index);
+				}
 			})
 		} else {
 			this.setState({ currentVideos: [{ name: null, file: null }, { name: null, file: null }] });
@@ -343,6 +348,7 @@ export default class extends PureComponent {
 	}
 
 	selectVideo = (currentVideo, id) => {
+		console.log(currentVideo);
 		let currentVideoIndex =  this.base64Videos.findIndex(item => {
 			return item.fileName === currentVideo.fileName
 		});
@@ -351,6 +357,8 @@ export default class extends PureComponent {
 
 		currentVideoIndexes[id] = currentVideoIndex;
 		currentVideos[id] = currentVideo;
+
+		console.log(currentVideos);
 
 		this.setState({ currentVideos, currentVideoIndexes });
 	};
@@ -379,6 +387,8 @@ export default class extends PureComponent {
 			this.selectVideo(this.state.freshVideos[nextIndex], id);
 		} else {
 			let currentVideoIndexes = [...this.state.currentVideoIndexes];
+
+			console.log(currentVideoIndexes);
 
 			currentVideoIndexes[id] = 0;
 
