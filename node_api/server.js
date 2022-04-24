@@ -47,6 +47,7 @@ const server = app.listen(port, () => {
 	app.use('/api', ConfigRoute);
 	app.use('/api', ImageRoute);
 	app.use('/media', express.static(__dirname + '/images'));
+	app.use('/movies', express.static(__dirname + '/video'));
 	app.use('/images', filemanager.middleware(configFilesImages));
 	app.use('/videos', filemanager.middleware(configFilesVideos));
 	app.use(express.static(__dirname));
