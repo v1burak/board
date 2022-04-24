@@ -112,7 +112,7 @@ export default class extends PureComponent {
 
 	render() {
 		return (
-			<main role="main" className={this.state.enabled ? 'main m-enabled': 'main m-disabled'}>
+			<main role="main" className={this.state.enabled ? 'main app-inner m-enabled': 'main app-inner m-disabled'}>
 				<div className="album bg-light">
 					<div className="box">
 						{this.state.configIsReturned && this.state.videoIsReturned ? this.setTemplate() : <h1>Loading...</h1>}
@@ -152,12 +152,12 @@ export default class extends PureComponent {
 		const width = params.width ? params.width : '100';
 		const height = params.height ? params.height : '100';
 
-		if (!this.state.currentVideos[i]) return;
+		if (!this.state.currentVideos[i] || !this.state.currentVideos[i].fileName) return;
 
 		return (
 			<div className="video-box" key={index} data-width={width} data-height={height}>
 				<VideoBox
-					src={this.state.currentVideos[i].file}
+					src={'http://' + window.location.hostname + ':' + API_PORT + '/movies/' + this.state.currentVideos[i].fileName}
 					autoPlay={this.state.controls[i].autoPlay}
 					onEnded={this.onVideoEnd}
 					data={this.state.currentVideos[i]}
