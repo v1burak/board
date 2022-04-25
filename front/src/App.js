@@ -157,7 +157,7 @@ export default class extends PureComponent {
 		return (
 			<div className="video-box" key={index} data-width={width} data-height={height}>
 				<VideoBox
-					src={'http://' + window.location.hostname + ':' + API_PORT + '/movies/' + this.state.currentVideos[i].fileName}
+					src={this.state.currentVideos[i].file}
 					autoPlay={this.state.controls[i].autoPlay}
 					onEnded={this.onVideoEnd}
 					data={this.state.currentVideos[i]}
