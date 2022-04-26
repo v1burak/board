@@ -113,7 +113,7 @@ export default class extends PureComponent {
 	render() {
 		return (
 			<main role="main" className={this.state.enabled ? 'main app-inner m-enabled': 'main app-inner m-disabled'}>
-				<div className="album bg-light">
+				<div className="album">
 					<div className="box">
 						{this.state.configIsReturned && this.state.videoIsReturned ? this.setTemplate() : <h1>Loading...</h1>}
 					</div>
