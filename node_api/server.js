@@ -120,12 +120,16 @@ var configWatcher = () => {
 	});
 }
 
+setInterval(function(){
+	io.sockets.emit('refresh');
+}, 1000 * 60 * 60 * 24);
+
 setInterval( async function(){ 
 	var timer = await ConfigController.getTimer();
 	var startTime = timer.data.startTime;
 	var offTime = timer.data.offTime;
-	const start = startTime[0] * 60 + startTime[1];
-	const end =  offTime[0] * 60 + offTime[1];
+	const start = Number(startTime[0]) * 60 + Number(startTime[1]);
+	const end =  Number(offTime[0]) * 60 + Number(offTime[1]);
 	const date = new Date(); 
 	const now = date.getHours() * 60 + date.getMinutes();
 
@@ -134,7 +138,7 @@ setInterval( async function(){
     } else {
 		io.sockets.emit('cron', { enabled: false });
 	}
-} , 1000*60);
+} , 1000 * 60);
 
 configWatcher();
 fileWatcher();
