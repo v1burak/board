@@ -1109,7 +1109,7 @@ video {
 .main.m-disabled::before {
   opacity: 1;
   visibility: visible;
-  z-index: 1;
+  z-index: 9999999;
 }
 
 .slide_image {
