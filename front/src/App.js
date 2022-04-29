@@ -42,7 +42,8 @@ export default class extends PureComponent {
 			currentVideoIndexes: [],
 			controls: [],
 			enabled: true,
-			images: []
+			images: [],
+			timer: {}
 		};
 	}
 
@@ -63,13 +64,25 @@ export default class extends PureComponent {
 		this.socket.on('refresh', (data) => {
 			window.location.reload();
 		});
-		this.socket.on('cron', (data) => {
-			this.setState({enabled : data.enabled});
-		});
 
 		this.getConfig();
 		this.fetchAllVideos();
 		this.fetchAllImages();
+		this.getTimer();
+		this.setTimerState();
+	}
+
+	setTimerState() {
+		setInterval(() => {
+			var startTime = this.state.timer.startTime;
+			var offTime = this.state.timer.offTime;
+			const start = Number(startTime[0]) * 60 + Number(startTime[1]);
+			const end =  Number(offTime[0]) * 60 + Number(offTime[1]);
+			const date = new Date(); 
+			const now = date.getHours() * 60 + date.getMinutes();
+
+			this.setState({enabled: start <= now && now <= end})
+		}, 1000 * 30);
 	}
 
 	getConfig() {
@@ -82,6 +95,15 @@ export default class extends PureComponent {
 				currentVideos: this.getCurrentVideos(),
 				controls: this.getControls()
 			});
+		}).catch(error => {
+			alert(error);
+		});
+	}
+
+	getTimer() {
+		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/config/timer').then(response => response.json())
+		.then(data => {
+			this.setState({timer : data});
 		}).catch(error => {
 			alert(error);
 		});
