@@ -81,8 +81,8 @@ export default class extends PureComponent {
 			const date = new Date(); 
 			const now = date.getHours() * 60 + date.getMinutes();
 
-			this.setState({enabled: start <= now && now <= end})
-		}, 1000 * 30);
+			this.setState({enabled: start <= now && now < end})
+		}, 1000 * 10);
 	}
 
 	getConfig() {
