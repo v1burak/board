@@ -712,7 +712,9 @@ video {
   .glyphicon.save-button,
   .glyphicon.timer-button,
   .glyphicon.grid-button,
-  .glyphicon.logout-button {
+  .glyphicon.logout-button,
+  .glyphicon.media-button,
+  .glyphicon.refresh-button {
     top: 15px;
     right: 15px;
     font-size: 15px;
@@ -730,7 +732,17 @@ video {
   }
 
   .glyphicon.logout-button {
-    top: 200px;
+    top: 205px;
+    right: 15px;
+  }
+
+  .glyphicon.media-button {
+    top: 275px;
+    right: 15px;
+  }
+
+  .setting-navigation .glyphicon.refresh-button {
+    top: 335px;
     right: 15px;
   }
 }
@@ -897,6 +909,8 @@ video {
 .modal-dialog {
   width: 500px;
   left: 0;
+  max-width: 100%;
+  margin: 0 auto;
 }
 
 [data-row-height="5"] {
@@ -1034,6 +1048,7 @@ video {
 
 .modal-body.m-preview {
   height: calc((478px / 3) * 4);
+  max-height: 80vh;
   background: azure;
   overflow: hidden;
 }

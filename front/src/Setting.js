@@ -766,6 +766,10 @@ class Setting extends Component {
       timerModalState: !this.state.timerModalState
     });
 
+    setTimeout(() => {
+      this.handleRefreshPage(event);
+    }, 1000)
+
     await this.postData('http://' + window.location.hostname + ':' + API_PORT + '/api/config/timer', timer);
   }
 
