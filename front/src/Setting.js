@@ -22,12 +22,14 @@ class Setting extends Component {
     timerStart: ['00', '00'],
     timerEnd: ['23', '59'],
     token: sessionStorage.getItem('auth'),
-    images: []
+    images: [],
+    media: []
   }
 
   componentDidMount() {
     this.getConfig();
     this.fetchAllImages();
+    this.fetchAllMedia();
     this.getTimer();
   }
 
@@ -39,6 +41,15 @@ class Setting extends Component {
 			alert(error);
 		});
 	}
+
+  fetchAllMedia() {
+    fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/catalog').then(response => response.json())
+		.then(data => {
+			this.setState({media : data.data});
+		}).catch(error => {
+			alert(error);
+		});
+  }
 
   getTimer() {
     fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/config/timer').then(response => response.json())
@@ -95,6 +106,10 @@ class Setting extends Component {
           rows[counter].cols = [
             {width: (row.width / 100) * 12, type: row.type, value: row.startPosition, images: row.images, delay: row.delay}
           ];
+        } else if (row.type === 'media') {
+          rows[counter].cols = [
+            {width: (row.width / 100) * 12, type: row.type, value: row.startPosition, media: row.media, delay: row.delay}
+          ];
         }
         
       } else {
@@ -108,6 +123,8 @@ class Setting extends Component {
           rows[counter].cols.push({width: (row.width / 100) * 12, type: row.type, value: row.url});
         } else if (row.type === 'slider') {
           rows[counter].cols.push({width: (row.width / 100) * 12, type: row.type, value: row.startPosition, images: row.images, delay: row.delay});
+        } else if (row.type === 'media') {
+          rows[counter].cols.push({width: (row.width / 100) * 12, type: row.type, value: row.startPosition, media: row.media, delay: row.delay});
         }
       }
     })
@@ -335,6 +352,8 @@ class Setting extends Component {
 
             if (col.type === 'slider') {
               col.images = [];
+            } else if (col.type === 'media') {
+              col.media = [];
             } else {
               delete col.images;
             }
@@ -362,6 +381,29 @@ class Setting extends Component {
         const newCol = row.cols.map((col, i) => {
           if (index === i) {
             col.images = value;
+            return col
+          } else {
+            return col
+          }
+        })
+        row.cols = newCol
+        return row;
+      } else {
+        return row;
+      }
+    })
+
+    this.setState({
+      rows
+    })
+  }
+
+  updateSelectMediaState = (row_number, index, value) => {
+    const rows = this.state.rows.map((row, id) => {
+      if (row.row_number === row_number) {
+        const newCol = row.cols.map((col, i) => {
+          if (index === i) {
+            col.media = value;
             return col
           } else {
             return col
@@ -535,6 +577,10 @@ class Setting extends Component {
           colParams.images = col.images;
           colParams.delay = col.delay;
           colParams.startPosition = Number(col.value);
+        } else if (col.type === 'media') {
+          colParams.media = col.media;
+          colParams.delay = col.delay;
+          colParams.startPosition = Number(col.value);
         }
 
         rows.push(colParams);
@@ -690,9 +736,11 @@ class Setting extends Component {
                         updateSelectState={this.updateSelectState}
                         updateInputState={this.updateInputState}
                         updateSelectImageState={this.updateSelectImageState}
+                        updateSelectMediaState={this.updateSelectMediaState}
                         updateInputDelayState={this.updateInputDelayState}
                         deleteSelectedColumn={this.deleteSelectedColumn}
                         images={this.state.images}
+                        media={this.state.media}
                       />
             })
           }

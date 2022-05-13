@@ -11,10 +11,12 @@ import "./App.css";
 const CONFIG_TYPES = {
 	VIDEO: 'video',
 	FRAME: 'frame',
-	SLIDER: 'slider'
+	SLIDER: 'slider',
+	MEDIA: 'media'
 }
 
 export default class extends PureComponent {
+	slider = React.createRef();
 	i = 0;
 	base64Videos = [];
 	tmpBase64Videos = [];
@@ -43,6 +45,8 @@ export default class extends PureComponent {
 			controls: [],
 			enabled: true,
 			images: [],
+			media: [],
+			mediaVideos: [],
 			timer: {}
 		};
 	}
@@ -68,6 +72,7 @@ export default class extends PureComponent {
 		this.getConfig();
 		this.fetchAllVideos();
 		this.fetchAllImages();
+		this.fetchAllMedia();
 		this.getTimer();
 		this.setTimerState();
 	}
@@ -81,8 +86,8 @@ export default class extends PureComponent {
 			const date = new Date(); 
 			const now = date.getHours() * 60 + date.getMinutes();
 
-			this.setState({enabled: start <= now && now < end})
-		}, 1000 * 10);
+			this.setState({enabled: start <= now && now <= end})
+		}, 1000 * 30);
 	}
 
 	getConfig() {
@@ -132,6 +137,15 @@ export default class extends PureComponent {
 		});
 	}
 
+	fetchAllMedia() {
+		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/catalog').then(response => response.json())
+		.then(data => {
+			this.setState({media : data.data});
+		}).catch(error => {
+			alert(error);
+		});
+	}
+
 	render() {
 		return (
 			<main role="main" className={this.state.enabled ? 'main app-inner m-enabled': 'main app-inner m-disabled'}>
@@ -164,6 +178,8 @@ export default class extends PureComponent {
 				return this.getFrameTemplate(item.url, index, item);
 			} else if (item.type === CONFIG_TYPES.SLIDER) {
 				return this.getSliderTemplate(i, index, item);
+			} else if (item.type === CONFIG_TYPES.MEDIA) {
+				return this.getMediaTemplate(i, index, item);
 			}
 
 			return null;
@@ -258,6 +274,118 @@ export default class extends PureComponent {
 			<div key={index} data-width={width} data-height={height} className="images-wrapper">
 				<Slider {...settings} key={`$.${index}`}>
 					{imagesList}
+				</Slider>
+			</div>
+		);
+	}
+
+	getBaseMedia64(file, cb) {
+		let reader = new FileReader();
+		reader.readAsDataURL(file);
+		reader.onload = function () {
+			cb(reader.result)
+		};
+		reader.onerror = function (error) {
+			console.log('Error: ', error);
+		};
+	}
+
+	getMediaTemplate(i, index, params) {
+		const width = params.width ? params.width : '100';
+		const height = params.height ? params.height : '100';
+		const videoArray = [];
+		const settings = {
+			dots: false,
+			infinite: true,
+			fade: true,
+			lazyLoad: true,
+			speed: 1500,
+			autoplaySpeed: params.delay ? Number(params.delay) : 3000,
+			autoplay: true,
+			slidesToShow: 1,
+			slidesToScroll: 1,
+			beforeChange: (_, id) => {
+				let currentVideo = videoArray.filter(video => video.id === id);
+
+				if (!currentVideo.length) {
+					return;
+				}
+
+				let videoRef = currentVideo[0].ref.current;
+
+				if (videoRef.currentTime) {
+					videoRef.currentTime = 0;
+				}
+
+				this.slider.current.slickPause();
+
+				setTimeout(() => {
+					this.slider.current.slickPlay();
+				}, Math.round(videoRef.duration * 1000))
+			}
+		};
+		let mediaArray = this.state.media;
+
+		if (!mediaArray.length) {
+			return false;
+		}
+
+		const firstHalf = mediaArray.slice(0, params.startPosition)
+		const secondHalf = mediaArray.slice(params.startPosition);
+
+		mediaArray = secondHalf.concat(firstHalf);
+		
+		let mediaList = mediaArray.map((cFile, index) => {
+			let mediaObj;
+
+			params.media.forEach((file) => {
+				if (cFile.fileName === file.fileName) {
+					mediaObj = cFile;
+				}
+			})
+
+			if (!mediaObj) {
+				return <></>;
+			}
+
+			if (mediaObj.fileName.split('.')[1] === 'mp4') {
+				let myVideoRef = React.createRef();
+
+				videoArray.push({
+					id: index,
+					ref: myVideoRef
+				});
+
+				return (
+					<div className="slide_item" key={index}>
+						<video autoPlay={true} muted loop ref={myVideoRef} alt={mediaObj.fileName} className="slide_image">
+							<source src={'http://' + window.location.hostname + ':' + API_PORT + '/catalog/' + mediaObj.fileName} type="video/mp4" />
+						</video>
+					</div>
+				);
+			}
+
+			return (
+				<div className="slide_item" key={index}>
+					<img src={'http://' + window.location.hostname + ':' + API_PORT + '/catalog/' + mediaObj.fileName} alt={mediaObj.fileName} className="slide_image"/>
+				</div>
+			);
+		})
+
+		if (mediaList.filter(img => img.props.className).length === 1) {
+			return (
+				<div key={index} data-width={width} data-height={height} className="images-wrapper">
+					{mediaList}
+				</div>
+			)
+		}
+
+		mediaList = mediaList.filter(img => img.props.className);
+
+		return (
+			<div key={index} data-width={width} data-height={height} className="images-wrapper">
+				<Slider {...settings} key={`$.${index}`} ref={this.slider}>
+					{mediaList}
 				</Slider>
 			</div>
 		);
