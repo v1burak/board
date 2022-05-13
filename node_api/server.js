@@ -5,7 +5,9 @@ var express = require('express'),
 let VideoRoute = require('./routes/VideoRoute');
 let ConfigRoute = require('./routes/ConfigRoute');
 let ImageRoute = require('./routes/ImageRoute');
+let MediaRoute = require('./routes/MediaRoute');
 let VideoController = require('./controllers/VideoController');
+let MediaController = require('./controllers/MediaController');
 let ConfigController = require('./controllers/ConfigController');
 let ImageController = require('./controllers/ImageController');
 var sockets = [];
@@ -14,6 +16,10 @@ var port = process.env.EXPRESS_PORT;
 let configFilesImages = {
 	fsRoot: path.resolve(__dirname, './images'),
 	rootName: 'Images',
+};
+let configFilesCatalog = {
+	fsRoot: path.resolve(__dirname, './media'),
+	rootName: 'Media',
 };
 let configFilesVideos = {
 	fsRoot: path.resolve(__dirname, './video'),
@@ -46,10 +52,13 @@ const server = app.listen(port, () => {
 	app.use('/api', VideoRoute);
 	app.use('/api', ConfigRoute);
 	app.use('/api', ImageRoute);
+	app.use('/api', MediaRoute);
 	app.use('/media', express.static(__dirname + '/images'));
+	app.use('/catalog', express.static(__dirname + '/media'));
 	app.use('/movies', express.static(__dirname + '/video'));
 	app.use('/images', filemanager.middleware(configFilesImages));
 	app.use('/videos', filemanager.middleware(configFilesVideos));
+	app.use('/catalog', filemanager.middleware(configFilesCatalog));
 	app.use(express.static(__dirname));
 });
 	
@@ -88,6 +97,22 @@ var fileWatcher = () => {
 
 		if (!videosJSON.error) {
 			io.sockets.emit('videos', { videos: videosJSON.data });
+		}
+	})
+
+	watcher.on('add', async function () {
+		const mediaJSON = await MediaController.getMediaFromDirectory();
+
+		if (!mediaJSON.error) {
+			io.sockets.emit('media', { media: mediaJSON.data });
+		}
+	})
+
+	watcher.on('change', async function () {
+		const mediaJSON = await MediaController.getMediaFromDirectory();
+
+		if (!mediaJSON.error) {
+			io.sockets.emit('media', { media: mediaJSON.data });
 		}
 	})
 
