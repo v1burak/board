@@ -8,7 +8,8 @@ import './Col.css';
 const TYPES = {
   frame: 'frame',
   video: 'video',
-  slider: 'slider'
+  slider: 'slider',
+  media: 'media'
 }
 
 class Col extends Component {
@@ -17,7 +18,8 @@ class Col extends Component {
     type: this.props.config.type,
     inputValue: this.props.inputValue,
     inputDelayValue: this.props.config.delay,
-    selectedImages: []
+    selectedImages: [],
+    selectedMedia: []
   }
 
   componentDidMount () {
@@ -27,6 +29,10 @@ class Col extends Component {
     if (this.props.config.type === 'slider') {
       this.setState({
         selectedImages: this.props.config.images.map(img => img.fileName)
+      })
+    } else if (this.props.config.type === 'media') {
+      this.setState({
+        selectedMedia: this.props.config.media.map(file => file.fileName)
       })
     }
   }
@@ -122,6 +128,25 @@ class Col extends Component {
     }));
   }
 
+  handleSelectAllMediaChange = event => {
+    var selectedCheckbox = event.target.checked;
+    var selected = [];
+
+    if (selectedCheckbox) {
+      selected = this.props.media.map(img => img.fileName);
+    } else {
+      selected = [];
+    }
+
+    this.setState({
+      selectedMedia: selected
+    });
+
+    this.props.updateSelectMediaState(this.props.row, this.props.id, selected.map(option => {
+      return {fileName: option}
+    }));
+  }
+
   handleSelectChange = event => {
     var value = event.target.getAttribute('data-value');
     var selectedCheckbox = event.target.checked;
@@ -138,6 +163,26 @@ class Col extends Component {
     });
 
     this.props.updateSelectImageState(this.props.row, this.props.id, selected.map(option => {
+      return {fileName: option}
+    }));
+  }
+
+  handleSelectMediaChange = event => {
+    var value = event.target.getAttribute('data-value');
+    var selectedCheckbox = event.target.checked;
+    var selected = this.state.selectedMedia;
+
+    if (selectedCheckbox) {
+      selected.push(value)
+    } else {
+      selected.splice(selected.findIndex(e => e === value),1);
+    }
+
+    this.setState({
+      selectedMedia: selected
+    });
+
+    this.props.updateSelectMediaState(this.props.row, this.props.id, selected.map(option => {
       return {fileName: option}
     }));
   }
@@ -169,6 +214,43 @@ class Col extends Component {
               <span className="switch__span">Select all</span>
             </label>
             {imagesOptions}
+          </div>
+        </div>
+        <div className="form-group col-12">
+          <label className="form-label">Please choose delay time (seconds)</label>
+          <input className="form-control input" type="number" placeholder="Slider delay" step="0.1" value={this.state.inputDelayValue / 1000} onChange={this.handleInputDelayChange} />
+        </div>
+      </>
+    )
+  }
+
+  returnMediaTemplate = () => {
+    if (!this.props.media.length) {
+      return false;
+    }
+
+    const mediaOptions = this.props.media.map((media, index) => {
+      const checked = this.state.selectedMedia.filter(file => file === media.fileName).length;
+
+      return (
+        <label className="switch" key={index}>
+          <input className="switch__input" type="checkbox" data-value={media.fileName} checked={checked} onChange={this.handleSelectMediaChange}/>
+          <i className="switch__icon"></i>
+          <span className="switch__span">{media.fileName}</span>
+        </label>
+      )
+    })
+    return (
+      <>
+        <div className="form-group col-12">
+          <label className="form-label">Please choose an image</label>
+          <div className="switch-list">
+            <label className="switch">
+              <input className="switch__input" type="checkbox" onChange={this.handleSelectAllMediaChange}/>
+              <i className="switch__icon"></i>
+              <span className="switch__span">Select all</span>
+            </label>
+            {mediaOptions}
           </div>
         </div>
         <div className="form-group col-12">
@@ -273,9 +355,13 @@ class Col extends Component {
                 <option value="slider">
                   Slider
                 </option>
+                <option value="media">
+                  Media
+                </option>
               </select>
             </div>
             {this.props.config.type === 'slider' ? this.returnSliderTemplate() : null}
+            {this.props.config.type === 'media' ? this.returnMediaTemplate() : null}
             <div className="form-group col-12">
               <label className="form-label">Please {this.props.config.type === 'frame' ? 'add iframe url': 'choose start position value'}</label>
               {controlInput}
