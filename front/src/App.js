@@ -313,15 +313,19 @@ export default class extends PureComponent {
 
 				let videoRef = currentVideo[0].ref.current;
 
-				if (videoRef.currentTime) {
+				console.log(currentVideo);
+
+				if (videoRef && videoRef.currentTime) {
 					videoRef.currentTime = 0;
+				} else {
+					return;
 				}
 
 				this.slider.current.slickPause();
 
 				setTimeout(() => {
 					this.slider.current.slickPlay();
-				}, Math.round(videoRef.duration * 1000))
+				}, Math.round((videoRef.duration * 1000) - (params.delay ? Number(params.delay) : 3000) - 1000))
 			}
 		};
 		let mediaArray = this.state.media;
