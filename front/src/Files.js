@@ -19,7 +19,7 @@ class Files extends Component {
         },
         apiOptionsMedia: {
             ...connector.apiOptions,
-            apiRoot: 'http://' + window.location.hostname + ':3001/media'
+            apiRoot: 'http://' + window.location.hostname + ':3001/catalog'
         }
     }
 
