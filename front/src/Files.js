@@ -16,6 +16,10 @@ class Files extends Component {
         apiOptionsVideos: {
             ...connector.apiOptions,
             apiRoot: 'http://' + window.location.hostname + ':3001/videos'
+        },
+        apiOptionsMedia: {
+            ...connector.apiOptions,
+            apiRoot: 'http://' + window.location.hostname + ':3001/media'
         }
     }
 
@@ -56,6 +60,15 @@ class Files extends Component {
                             id="filemanager-1"
                             api={connector.api}
                             apiOptions={this.state.apiOptionsVideos}
+                            capabilities={connector.capabilities}
+                            listViewLayout={connector.listViewLayout}
+                            viewLayoutOptions={connector.viewLayoutOptions}
+                            onResourceItemClick={this.onResourceItemClick}
+                        />
+                        <FileNavigator
+                            id="filemanager-1"
+                            api={connector.api}
+                            apiOptions={this.state.apiOptionsMedia}
                             capabilities={connector.capabilities}
                             listViewLayout={connector.listViewLayout}
                             viewLayoutOptions={connector.viewLayoutOptions}
