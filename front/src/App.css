@@ -703,6 +703,13 @@ video {
   width: 850px;
 }
 
+.time-block {
+  position: fixed;
+  top: 20px;
+  right: 50px;
+  font-size: 16px;
+}
+
 @media screen and (max-width: 1024px) {
   .app {
     padding-right: 80px;
@@ -744,6 +751,12 @@ video {
   .setting-navigation .glyphicon.refresh-button {
     top: 335px;
     right: 15px;
+  }
+
+  .time-block {
+    top: 400px;
+    right: 10px;
+    font-size: 12px;
   }
 }
 

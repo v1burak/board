@@ -23,7 +23,16 @@ class Setting extends Component {
     timerEnd: ['23', '59'],
     token: sessionStorage.getItem('auth'),
     images: [],
-    media: []
+    media: [],
+    date: new Date()
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timerId);
+  }
+
+  tick() {
+    this.setState({date: new Date()});
   }
 
   componentDidMount() {
@@ -31,6 +40,7 @@ class Setting extends Component {
     this.fetchAllImages();
     this.fetchAllMedia();
     this.getTimer();
+    this.timerId = setInterval(() => this.tick(), 1000);
   }
 
   fetchAllImages() {
@@ -927,6 +937,12 @@ class Setting extends Component {
               className="glyphicon glyphicon-remove logout-button btn-icon"
             >
               <span className="subtitle-btn">Logout</span>
+            </span>
+            <span
+              title="Current time"
+              className="time-block"
+            >
+              {this.state.date.toLocaleTimeString()}
             </span>
         </div>
         {this.state.previewModalState ? this.previewModal() : null}
