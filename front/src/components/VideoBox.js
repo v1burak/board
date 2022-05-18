@@ -5,6 +5,7 @@ export default class extends PureComponent {
         return (
             <div className="video-wrapper">
                 <video
+                    ref={this.props.refEl}
                     src={this.props.src}
                     autoPlay={this.props.autoPlay}
                     onEnded={this.props.onEnded}

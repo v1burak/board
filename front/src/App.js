@@ -2,6 +2,7 @@ import React, { PureComponent } from "react";
 import SocketIOClient from 'socket.io-client';
 import Slider from "react-slick";
 
+import { API_PORT, SOCKET_PORT } from './helper/Config';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import VideoBox from "./components/VideoBox";
@@ -51,7 +52,7 @@ export default class extends PureComponent {
 	}
 
 	componentDidMount() {
-		this.socket = SocketIOClient('http://127.0.0.1:3001/');
+		this.socket = SocketIOClient(window.location.hostname + ':' + SOCKET_PORT);
 		this.socket.on('videos', (data) => {
 			this.tmpBase64Videos = [];
 			this.i = 0;
@@ -90,7 +91,7 @@ export default class extends PureComponent {
 	}
 
 	getConfig() {
-		fetch('/api/config').then(response => response.json())
+		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/config').then(response => response.json())
 		.then(data => {
 			this.setState({config : data});
 			this.setState({
@@ -105,7 +106,7 @@ export default class extends PureComponent {
 	}
 
 	getTimer() {
-		fetch('/api/config/timer').then(response => response.json())
+		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/config/timer').then(response => response.json())
 		.then(data => {
 			this.setState({timer : data});
 		}).catch(error => {
@@ -113,14 +114,21 @@ export default class extends PureComponent {
 		});
 	}
 
+	toBase64 = file => new Promise((resolve, reject) => {
+		const reader = new FileReader();
+		reader.readAsDataURL(file);
+		reader.onload = () => resolve(reader.result);
+		reader.onerror = error => reject(error);
+	});
+
 	fetchAllVideos() {
-		fetch('/api/videos').then(response => response.json())
+		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/videos').then(response => response.json())
 		.then(data => {
 			this.tmpBase64Videos = [];
 			this.i = 0;
 			this.videos = data.data;
 			this.updated = false;
-			this.convertUrlTObase64(data.data);
+			this.convertUrlTObase64(data.data, 'video');
 			this.setState({videoIsReturned : true});
 		}).catch(error => {
 			alert(error);
@@ -128,7 +136,7 @@ export default class extends PureComponent {
 	}
 
 	fetchAllImages() {
-		fetch('/api/images').then(response => response.json())
+		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/images').then(response => response.json())
 		.then(data => {
 			this.setState({images : data.data});
 		}).catch(error => {
@@ -137,9 +145,15 @@ export default class extends PureComponent {
 	}
 
 	fetchAllMedia() {
-		fetch('/api/catalog').then(response => response.json())
+		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/catalog').then(response => response.json())
 		.then(data => {
 			this.setState({media : data.data});
+
+			this.tmpBase64Videos = [];
+			this.i = 0;
+			this.videos = data.data.filter(item => item.fileName.split('.')[1] === 'mp4');
+			this.updated = false;
+			this.convertUrlTObase64(data.data.filter(item => item.fileName.split('.')[1] === 'mp4'), 'catalog');
 		}).catch(error => {
 			alert(error);
 		});
@@ -254,7 +268,7 @@ export default class extends PureComponent {
 
 			return (
 				<div className="slide_item" key={index}>
-					<img src={'/media/' + imageObj.fileName} alt={imageObj.fileName} className="slide_image"/>
+					<img src={'http://' + window.location.hostname + ':' + API_PORT + '/media/' + imageObj.fileName} alt={imageObj.fileName} className="slide_image"/>
 				</div>
 			);
 		})
@@ -312,8 +326,6 @@ export default class extends PureComponent {
 
 				let videoRef = currentVideo[0].ref.current;
 
-				console.log(currentVideo);
-
 				if (videoRef && videoRef.currentTime) {
 					videoRef.currentTime = 0;
 				} else {
@@ -359,18 +371,20 @@ export default class extends PureComponent {
 					ref: myVideoRef
 				});
 
+				const base64 = this.state.freshVideos.filter(item => {
+					return item.fileName === mediaObj.fileName;
+				})
+
 				return (
 					<div className="slide_item" key={index}>
-						<video autoPlay={true} playsInline muted loop ref={myVideoRef} alt={mediaObj.fileName} className="slide_image">
-							<source src={'/cataloglist/' + mediaObj.fileName} type="video/mp4" />
-						</video>
+						<video autoPlay={true} muted loop ref={myVideoRef} src={base64[0] ? base64[0].file : null} alt={mediaObj.fileName} className="slide_image" />
 					</div>
 				);
 			}
 
 			return (
 				<div className="slide_item" key={index}>
-					<img src={'/cataloglist/' + mediaObj.fileName} alt={mediaObj.fileName} className="slide_image"/>
+					<img src={'http://' + window.location.hostname + ':' + API_PORT + '/catalog/' + mediaObj.fileName} alt={mediaObj.fileName} className="slide_image"/>
 				</div>
 			);
 		})
@@ -427,13 +441,13 @@ export default class extends PureComponent {
 	};
 
 	checkUpdate() {
-		fetch('/api/videos').then(response => response.json())
+		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/videos').then(response => response.json())
 		.then(data => {
 			this.updated = !this.equals(this.videos, data.data);
 		}).catch(error => {
 			alert(error);
 		});
-		fetch('/api/config').then(response => response.json())
+		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/config').then(response => response.json())
 		.then(data => {
 			this.updatedConfig = !this.equals(this.state.config, data);
 		}).catch(error => {
@@ -441,24 +455,24 @@ export default class extends PureComponent {
 		});
 	}
 
-	convertUrlTObase64(videos){
+	convertUrlTObase64(videos, type){
 		let video = videos[this.i];
 		if(video){
 			this.i++;
 			let isAlready = this.base64Videos.find(item => item.fileName === video.fileName);
 			if(!isAlready || isAlready.size !== video.size){
-				this.getBase64('/video/' + video.fileName, video.fileName, (result) => {
+				this.getBase64('http://' + window.location.hostname + ':' + API_PORT + '/' + type + '/' + video.fileName, video.fileName, (result) => {
 					let encoded = {
 						file: result,
 						fileName: video.fileName,
 						size: video.size
 					};
 					this.tmpBase64Videos.push(encoded);
-					this.convertUrlTObase64(videos);
+					this.convertUrlTObase64(videos, type);
 				});
 			} else {
 				this.tmpBase64Videos.push(isAlready);
-				this.convertUrlTObase64(videos);
+				this.convertUrlTObase64(videos, type);
 			}
 		} else {
 			this.base64Videos = Object.assign([], this.tmpBase64Videos);
