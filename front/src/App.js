@@ -2,7 +2,6 @@ import React, { PureComponent } from "react";
 import SocketIOClient from 'socket.io-client';
 import Slider from "react-slick";
 
-import { API_PORT, SOCKET_PORT } from './helper/Config';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import VideoBox from "./components/VideoBox";
@@ -52,7 +51,7 @@ export default class extends PureComponent {
 	}
 
 	componentDidMount() {
-		this.socket = SocketIOClient(window.location.hostname + ':' + SOCKET_PORT);
+		this.socket = SocketIOClient('http://127.0.0.1:3001/');
 		this.socket.on('videos', (data) => {
 			this.tmpBase64Videos = [];
 			this.i = 0;
@@ -91,7 +90,7 @@ export default class extends PureComponent {
 	}
 
 	getConfig() {
-		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/config').then(response => response.json())
+		fetch('/api/config').then(response => response.json())
 		.then(data => {
 			this.setState({config : data});
 			this.setState({
@@ -106,7 +105,7 @@ export default class extends PureComponent {
 	}
 
 	getTimer() {
-		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/config/timer').then(response => response.json())
+		fetch('/api/config/timer').then(response => response.json())
 		.then(data => {
 			this.setState({timer : data});
 		}).catch(error => {
@@ -115,7 +114,7 @@ export default class extends PureComponent {
 	}
 
 	fetchAllVideos() {
-		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/videos').then(response => response.json())
+		fetch('/api/videos').then(response => response.json())
 		.then(data => {
 			this.tmpBase64Videos = [];
 			this.i = 0;
@@ -129,7 +128,7 @@ export default class extends PureComponent {
 	}
 
 	fetchAllImages() {
-		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/images').then(response => response.json())
+		fetch('/api/images').then(response => response.json())
 		.then(data => {
 			this.setState({images : data.data});
 		}).catch(error => {
@@ -138,7 +137,7 @@ export default class extends PureComponent {
 	}
 
 	fetchAllMedia() {
-		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/catalog').then(response => response.json())
+		fetch('/api/catalog').then(response => response.json())
 		.then(data => {
 			this.setState({media : data.data});
 		}).catch(error => {
@@ -255,7 +254,7 @@ export default class extends PureComponent {
 
 			return (
 				<div className="slide_item" key={index}>
-					<img src={'http://' + window.location.hostname + ':' + API_PORT + '/media/' + imageObj.fileName} alt={imageObj.fileName} className="slide_image"/>
+					<img src={'/media/' + imageObj.fileName} alt={imageObj.fileName} className="slide_image"/>
 				</div>
 			);
 		})
@@ -362,8 +361,8 @@ export default class extends PureComponent {
 
 				return (
 					<div className="slide_item" key={index}>
-						<video autoPlay={true} muted loop ref={myVideoRef} alt={mediaObj.fileName} className="slide_image">
-							<source src={'http://' + window.location.hostname + ':' + API_PORT + '/catalog/' + mediaObj.fileName} type="video/mp4" />
+						<video autoPlay={true} playsInline muted loop ref={myVideoRef} alt={mediaObj.fileName} className="slide_image">
+							<source src={'/cataloglist/' + mediaObj.fileName} type="video/mp4" />
 						</video>
 					</div>
 				);
@@ -371,7 +370,7 @@ export default class extends PureComponent {
 
 			return (
 				<div className="slide_item" key={index}>
-					<img src={'http://' + window.location.hostname + ':' + API_PORT + '/catalog/' + mediaObj.fileName} alt={mediaObj.fileName} className="slide_image"/>
+					<img src={'/cataloglist/' + mediaObj.fileName} alt={mediaObj.fileName} className="slide_image"/>
 				</div>
 			);
 		})
@@ -428,13 +427,13 @@ export default class extends PureComponent {
 	};
 
 	checkUpdate() {
-		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/videos').then(response => response.json())
+		fetch('/api/videos').then(response => response.json())
 		.then(data => {
 			this.updated = !this.equals(this.videos, data.data);
 		}).catch(error => {
 			alert(error);
 		});
-		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/config').then(response => response.json())
+		fetch('/api/config').then(response => response.json())
 		.then(data => {
 			this.updatedConfig = !this.equals(this.state.config, data);
 		}).catch(error => {
@@ -448,7 +447,7 @@ export default class extends PureComponent {
 			this.i++;
 			let isAlready = this.base64Videos.find(item => item.fileName === video.fileName);
 			if(!isAlready || isAlready.size !== video.size){
-				this.getBase64('http://' + window.location.hostname + ':' + API_PORT + '/video/' + video.fileName, video.fileName, (result) => {
+				this.getBase64('/video/' + video.fileName, video.fileName, (result) => {
 					let encoded = {
 						file: result,
 						fileName: video.fileName,

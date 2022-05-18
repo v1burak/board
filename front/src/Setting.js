@@ -3,7 +3,6 @@ import SocketIOClient from 'socket.io-client';
 import Row from './components/setting/row/Row.js';
 import Col from './components/setting/col/Col.js';
 import Login from './components/setting/login/Login.js';
-import { API_PORT, SOCKET_PORT } from './helper/Config';
 
 import './App.css';
 
@@ -44,7 +43,7 @@ class Setting extends Component {
   }
 
   fetchAllImages() {
-		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/images').then(response => response.json())
+		fetch('/api/images').then(response => response.json())
 		.then(data => {
 			this.setState({images : data.data});
 		}).catch(error => {
@@ -53,7 +52,7 @@ class Setting extends Component {
 	}
 
   fetchAllMedia() {
-    fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/catalog').then(response => response.json())
+    fetch('/api/catalog').then(response => response.json())
 		.then(data => {
 			this.setState({media : data.data});
 		}).catch(error => {
@@ -62,7 +61,7 @@ class Setting extends Component {
   }
 
   getTimer() {
-    fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/config/timer').then(response => response.json())
+    fetch('/api/config/timer').then(response => response.json())
     .then(data => {
       this.setState({timerStart: data.startTime, timerEnd: data.offTime});
     }).catch(error => {
@@ -71,7 +70,7 @@ class Setting extends Component {
   }
 
   getConfig = () => {
-		fetch('http://' + window.location.hostname + ':' + API_PORT + '/api/config').then(response => response.json())
+		fetch('/api/config').then(response => response.json())
 		.then(data => {
       if (data.length) {
         this.setState({
@@ -601,7 +600,7 @@ class Setting extends Component {
       previewModalState: !this.state.previewModalState
     });
 
-    await this.postData('http://' + window.location.hostname + ':' + API_PORT + '/api/config', rows);
+    await this.postData('/api/config', rows);
   }
 
   postData = async (url = '', data = []) => {
@@ -828,7 +827,7 @@ class Setting extends Component {
       this.handleRefreshPage(event);
     }, 1000)
 
-    await this.postData('http://' + window.location.hostname + ':' + API_PORT + '/api/config/timer', timer);
+    await this.postData('/api/config/timer', timer);
   }
 
   timerModal = () => {
@@ -882,7 +881,7 @@ class Setting extends Component {
   handleRefreshPage = (event) => {
     event.preventDefault();
 
-    this.socket = SocketIOClient(window.location.hostname + ':' + SOCKET_PORT);
+    this.socket = SocketIOClient('http://127.0.0.1:3001/');
 
     this.socket.emit('refresh');
 }

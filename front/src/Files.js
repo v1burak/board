@@ -3,7 +3,6 @@ import Login from './components/setting/login/Login.js';
 import { FileManager, FileNavigator } from '@opuscapita/react-filemanager';
 import connector from '@opuscapita/react-filemanager-connector-node-v1';
 import SocketIOClient from 'socket.io-client';
-import { SOCKET_PORT } from './helper/Config';
 import './Files.css';
 
 class Files extends Component {
@@ -11,15 +10,15 @@ class Files extends Component {
         token: sessionStorage.getItem('auth'),
         apiOptionsImages: {
             ...connector.apiOptions,
-            apiRoot: 'http://' + window.location.hostname + ':3001/images'
+            apiRoot: '/images'
         },
         apiOptionsVideos: {
             ...connector.apiOptions,
-            apiRoot: 'http://' + window.location.hostname + ':3001/videos'
+            apiRoot: '/videos'
         },
         apiOptionsMedia: {
             ...connector.apiOptions,
-            apiRoot: 'http://' + window.location.hostname + ':3001/catalog'
+            apiRoot: '/catalog'
         }
     }
 
@@ -33,7 +32,7 @@ class Files extends Component {
     handleRefreshPage = (event) => {
         event.preventDefault();
 
-        this.socket = SocketIOClient(window.location.hostname + ':' + SOCKET_PORT);
+        this.socket = SocketIOClient('http://127.0.0.1:3001/');
 
         this.socket.emit('refresh');
     }
@@ -57,7 +56,7 @@ class Files extends Component {
                             onResourceItemClick={this.onResourceItemClick}
                         />
                         <FileNavigator
-                            id="filemanager-1"
+                            id="filemanager-2"
                             api={connector.api}
                             apiOptions={this.state.apiOptionsVideos}
                             capabilities={connector.capabilities}
@@ -66,7 +65,7 @@ class Files extends Component {
                             onResourceItemClick={this.onResourceItemClick}
                         />
                         <FileNavigator
-                            id="filemanager-1"
+                            id="filemanager-3"
                             api={connector.api}
                             apiOptions={this.state.apiOptionsMedia}
                             capabilities={connector.capabilities}
