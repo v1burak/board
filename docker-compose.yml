@@ -24,6 +24,9 @@ services:
       - type: bind
         source: /home/mihanich/share/images
         target: /app/images
+      - type: bind
+        source: /home/mihanich/share/media
+        target: /app/media
 
 networks:
   network-backend:
