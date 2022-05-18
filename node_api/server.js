@@ -10,7 +10,6 @@ let VideoController = require('./controllers/VideoController');
 let MediaController = require('./controllers/MediaController');
 let ConfigController = require('./controllers/ConfigController');
 let ImageController = require('./controllers/ImageController');
-const { createProxyMiddleware } = require('http-proxy-middleware');
 var sockets = [];
 const app = express();
 var port = process.env.EXPRESS_PORT;
@@ -43,11 +42,7 @@ app.use((req, res, next) => {
 });
 
 app.use(bodyParser.json({ limit: '10mb' }));
-app.use(cors({
-    credentials: true,
-    origin: ["http://localhost:3000"],
-    optionsSuccessStatus: 200
-}));
+app.use(cors());
 
 const server = app.listen(port, () => {
 	console.log('Listening on port ' + port);
@@ -59,7 +54,7 @@ const server = app.listen(port, () => {
 	app.use('/api', ImageRoute);
 	app.use('/api', MediaRoute);
 	app.use('/media', express.static(__dirname + '/images'));
-	app.use('/cataloglist', express.static(__dirname + '/media'));
+	app.use('/catalog', express.static(__dirname + '/media'));
 	app.use('/movies', express.static(__dirname + '/video'));
 	app.use('/images', filemanager.middleware(configFilesImages));
 	app.use('/videos', filemanager.middleware(configFilesVideos));
@@ -68,7 +63,7 @@ const server = app.listen(port, () => {
 });
 	
 var http = require('http').Server(app);
-var io = require('socket.io')(server);
+var io = require('socket.io')(http);
 var chokidar = require('chokidar');
 let dir = "./video";
 let config = "./config/config.json";
