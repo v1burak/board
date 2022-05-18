@@ -18,5 +18,8 @@
     "express": "^4.16.4",
     "fs": "0.0.1-security",
     "socket.io": "^2.2.0"
+  },
+  "devDependencies": {
+    "http-proxy-middleware": "^2.0.6"
   }
 }
