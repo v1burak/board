@@ -466,8 +466,6 @@ class Setting extends Component {
     const data = JSON.parse(e.dataTransfer.getData('col'));
     const movingCol = this.state.rows[data.row].cols[data.id] || this.state.rows[data.row].cols[0];
 
-    console.log(movingCol);
-
     document.querySelectorAll('.col-drag-item').forEach(el => el.classList.remove('col-drag-item'));
 
     if (data.row === row) {

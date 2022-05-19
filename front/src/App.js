@@ -319,7 +319,7 @@ export default class extends PureComponent {
 			slidesToScroll: 1,
 			beforeChange: (_, id) => {
 				let currentVideo = videoArray.filter(video => {
-					return video.id === id
+					return video.id === id;
 				});
 
 				if (!currentVideo.length) {
@@ -347,10 +347,7 @@ export default class extends PureComponent {
 			return false;
 		}
 
-		const firstHalf = mediaArray.slice(0, params.startPosition)
-		const secondHalf = mediaArray.slice(params.startPosition);
-
-		mediaArray = secondHalf.concat(firstHalf);
+		let counter = 0;
 		
 		let mediaList = mediaArray.map((cFile, index) => {
 			let mediaObj;
@@ -369,9 +366,11 @@ export default class extends PureComponent {
 				let myVideoRef = React.createRef();
 
 				videoArray.push({
-					id: index,
+					id: counter,
 					ref: myVideoRef
 				});
+
+				counter += 1;
 
 				const base64 = this.state.freshVideos.filter(item => {
 					return item.fileName === mediaObj.fileName;
@@ -383,6 +382,8 @@ export default class extends PureComponent {
 					</div>
 				);
 			}
+
+			counter += 1;
 
 			return (
 				<div className="slide_item" key={index}>

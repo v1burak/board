@@ -712,7 +712,7 @@ video {
 
 @media screen and (max-width: 1024px) {
   .app {
-    padding-right: 80px;
+    padding-right: 100px;
     width: auto;
   }
 
