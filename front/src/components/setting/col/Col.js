@@ -318,6 +318,8 @@ class Col extends Component {
       ];
 
       controlInput = <CreatableSelect options={options} defaultValue={options[0]} isSearchable={true} onChange={this.handleSelectUrlChange} />;
+    } else if (this.props.config.type === 'media') {
+      controlInput = <input className="form-control input" type="number" disabled placeholder="StartPosition" value={0} onChange={this.handleInputChange} />;
     } else {
       controlInput = <input className="form-control input" type="number" placeholder="StartPosition" value={this.props.config.value} onChange={this.handleInputChange} />;
     }

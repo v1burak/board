@@ -27,7 +27,7 @@
   padding: 6px;
 }
 
-.row-component:hover > .row-control, .row-control:hover {
+.row-component > .row-control, .row-control:hover {
   transform: translateX(26px);
 }
 
