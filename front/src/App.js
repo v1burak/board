@@ -346,6 +346,11 @@ export default class extends PureComponent {
 		if (!mediaArray.length) {
 			return false;
 		}
+
+		const firstHalf = mediaArray.slice(0, params.startPosition)
+		const secondHalf = mediaArray.slice(params.startPosition);
+
+		mediaArray = secondHalf.concat(firstHalf);
 		
 		let mediaList = mediaArray.map((cFile, index) => {
 			let mediaObj;
@@ -395,11 +400,6 @@ export default class extends PureComponent {
 		}
 
 		mediaList = mediaList.filter(img => img.props.className);
-
-		const firstHalf = mediaList.slice(0, params.startPosition)
-		const secondHalf = mediaList.slice(params.startPosition);
-
-		mediaList = secondHalf.concat(firstHalf);
 
 		return (
 			<div key={index} data-width={width} data-height={height} className="images-wrapper">
