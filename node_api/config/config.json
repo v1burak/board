@@ -1,1 +1,1 @@
-[{"type":"video","height":30,"width":100,"startPosition":1},{"type":"frame","height":40,"width":100,"url":"https://map.pannonia.com.ua/"},{"type":"slider","height":30,"width":100,"images":[{"fileName":"slider1.jpg"},{"fileName":"slider2.jpeg"}],"delay":5000,"startPosition":1}]
+[{"type":"media","height":100,"width":100,"media":[{"fileName":"2.png"},{"fileName":"IMG_20220505_165412_272.png"},{"fileName":"IMG_20220505_165419_810.png"}],"delay":8000,"startPosition":1}]
