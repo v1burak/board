@@ -1060,8 +1060,8 @@ video {
 }
 
 .modal-body.m-preview {
-  height: calc((478px / 3) * 4);
-  max-height: 70vh;
+  height: 300px;
+  max-height: 50vh;
   background: azure;
   overflow: hidden;
 }
